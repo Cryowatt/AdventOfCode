@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AdventOfCode2017": {
+      "commandName": "Project",
+      "commandLineArgs": "21"
+    }
+  }
+}
