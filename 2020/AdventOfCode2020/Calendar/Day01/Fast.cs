@@ -55,14 +55,6 @@ namespace AdventOfCode.Calendar.Day01
                     {
                         return a * b * c;
                     }
-                    //for (int k = i + j + 1; k < this.input.Length; k++)
-                    //{
-                    //    var c = this.input[k];
-                    //    if (a + b + c == 2020)
-                    //    {
-                    //        return a * b * c;
-                    //    }
-                    //}
                 }
             }
 
