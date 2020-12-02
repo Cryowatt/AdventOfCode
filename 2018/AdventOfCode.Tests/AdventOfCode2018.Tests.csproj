@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AdventOfCode.CSharp\AdventOfCode.CSharp.csproj" />
-    <ProjectReference Include="..\AdventOfCode.FSharp\AdventOfCode.FSharp.fsproj" />
+    <ProjectReference Include="..\AdventOfCode.CSharp\AdventOfCode2018.CSharp.csproj" />
+    <ProjectReference Include="..\AdventOfCode.FSharp\AdventOfCode2018.FSharp.fsproj" />
   </ItemGroup>
 
 </Project>

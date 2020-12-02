@@ -1,5 +1,4 @@
-﻿using AdventOfCode.CSharp;
-using AdventOfCode.FSharp;
+﻿using AdventOfCode2020.CSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,11 +27,11 @@ namespace AdventOfCode.Runner
         private static void Benchmark(int dayNumber, char part, Func<IDay, IEnumerable<string>, string> action)
         {
             IDayFactory csharp = new CSharpDayFactory();
-            IDayFactory fsharp = new FSharpDayFactory();
+            // IDayFactory fsharp = new FSharpDayFactory();
             var cday = csharp.GetDay(dayNumber);
-            var fday = fsharp.GetDay(dayNumber);
+            // var fday = fsharp.GetDay(dayNumber);
 
-            if (cday == null && fday == null)
+            if (cday == null /*&& fday == null*/)
             {
                 Console.WriteLine($"Day{dayNumber} not completed.");
                 return;
@@ -43,14 +42,15 @@ namespace AdventOfCode.Runner
             var canswer = action(cday, input);
             var csharpTime = timer.Elapsed.TotalSeconds;
             timer = Stopwatch.StartNew();
-            var fanswer = action(fday, input);
-            var fsharpTime = timer.Elapsed.TotalSeconds;
-
-            Console.Write($"Day {dayNumber}:{part}\t[{csharpTime}] [{fsharpTime - csharpTime}]\t[{canswer}]");
-            if (canswer != fanswer)
-            {
-                Console.Write($"\tANSWER MISMATCH! {canswer} != {fanswer}");
-            }
+            // var fanswer = action(fday, input);
+            // var fsharpTime = timer.Elapsed.TotalSeconds;
+            
+            Console.Write($"Day {dayNumber}:{part}\t[{csharpTime}]\t[{canswer}]");
+            //Console.Write($"Day {dayNumber}:{part}\t[{csharpTime}] [{fsharpTime - csharpTime}]\t[{canswer}]");
+            //if (canswer != fanswer)
+            //{
+            //    Console.Write($"\tANSWER MISMATCH! {canswer} != {fanswer}");
+            //}
             Console.WriteLine();
         }
     }

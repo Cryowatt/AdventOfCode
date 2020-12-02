@@ -16,8 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AdventOfCode.CSharp\AdventOfCode.CSharp.csproj" />
-    <ProjectReference Include="..\AdventOfCode.FSharp\AdventOfCode.FSharp.fsproj" />
+    <ProjectReference Include="..\..\2020\AdventOfCode2020.CSharp\AdventOfCode2020.CSharp.csproj" />
+    <ProjectReference Include="..\AdventOfCode.CSharp\AdventOfCode2018.CSharp.csproj" />
+    <ProjectReference Include="..\AdventOfCode.FSharp\AdventOfCode2018.FSharp.fsproj" />
+    <ProjectReference Include="..\AdventOfCode\AdventOfCode.csproj" />
   </ItemGroup>
 
 </Project>
