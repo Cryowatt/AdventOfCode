@@ -1,25 +1,19 @@
-﻿using AdventOfCode;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 
 namespace AdventOfCode.Calendar.Day01
 {
     public class Fast : SolutionBase<int[]>
     {
-        public Fast() : base(Parsers.Lines().Int().ToArray())
-        {
-        }
+        public Fast() : base(Parsers.Lines().Int().ToArray()) { }
 
         public override object PartA()
         {
             var result = new int[1010];
-            foreach(var item in this.input)
+            foreach (var item in this.input)
             {
                 var index = (item > 1010) ? 2020 - item : item;
 
-                if(result[index] > 0)
+                if (result[index] > 0)
                 {
                     return result[index] * item;
                 }
@@ -33,7 +27,7 @@ namespace AdventOfCode.Calendar.Day01
         public override object PartB()
         {
             var target = new int[2020];
-            foreach(var item in this.input)
+            foreach (var item in this.input)
             {
                 var index = 2020 - item;
                 target[index] = item;
@@ -46,12 +40,12 @@ namespace AdventOfCode.Calendar.Day01
                 {
                     var b = this.input[j];
                     var index = a + b;
-                    if(index > 2019)
+                    if (index > 2019)
                     {
                         continue;
                     }
                     var c = target[index];
-                    if(c > 0)
+                    if (c > 0)
                     {
                         return a * b * c;
                     }

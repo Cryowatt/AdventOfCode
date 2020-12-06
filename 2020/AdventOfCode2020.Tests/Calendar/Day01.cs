@@ -1,14 +1,11 @@
-﻿using System;
+﻿using AdventOfCode.Test;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AdventOfCode.Calendar.Day01
 {
-    public static class BaseTests
+    public class TestData : ITestData
     {
-        public static IEnumerable<(string Input, string Expected)> PartATests => new[]
+        public IEnumerable<(string Input, string Expected)> PartAData => new[]
         {
             (@"1721
             979
@@ -18,7 +15,7 @@ namespace AdventOfCode.Calendar.Day01
             1456", "514579")
         };
 
-        public static IEnumerable<(string Input, string Expected)> PartBTests => new[]
+        public IEnumerable<(string Input, string Expected)> PartBData => new[]
         {
             (@"1721
             979
@@ -29,24 +26,6 @@ namespace AdventOfCode.Calendar.Day01
         };
     }
 
-    public class BruteForceTest : DayTest<BruteForceTest, BruteForce>
-    {
-        public override IEnumerable<(string Input, string Expected)> PartATests => BaseTests.PartATests;
-
-        public override IEnumerable<(string Input, string Expected)> PartBTests => BaseTests.PartBTests;
-    }
-
-    public class SetOperationsTest : DayTest<SetOperationsTest, SetOperations>
-    {
-        public override IEnumerable<(string Input, string Expected)> PartATests => BaseTests.PartATests;
-
-        public override IEnumerable<(string Input, string Expected)> PartBTests => BaseTests.PartBTests;
-    }
-
-    public class FastTest : DayTest<FastTest, Fast>
-    {
-        public override IEnumerable<(string Input, string Expected)> PartATests => BaseTests.PartATests;
-
-        public override IEnumerable<(string Input, string Expected)> PartBTests => BaseTests.PartBTests;
-    }
+    public class BruteForceTest : DayTest<BruteForce, TestData> { }
+    public class FastTest : DayTest<Fast, TestData> { }
 }
