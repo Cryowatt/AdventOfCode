@@ -17,12 +17,9 @@ namespace AdventOfCode.Calendar.Day02
 
         public static IEnumerable<(string Input, string Expected)> PartBTests => new[]
         {
-            (@"1721
-            979
-            366
-            299
-            675
-            1456", "241861950")
+            ("1-3 a: abcde", "1"),
+            ("1-3 b: cdefg", "0"),
+            ("2-9 c: ccccccccc", "0")
         };
     }
 

@@ -36,7 +36,7 @@ namespace AdventOfCode
 
             lock (ConsoleSync)
             {
-                Console.SetCursorPosition(0, discoveredDays.Count() + 1);
+                Console.SetCursorPosition(0, (discoveredDays.Count() * 2) + 1);
                 Console.WriteLine($"Total execution time: {timer.Elapsed}");
             }
         }
