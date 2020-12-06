@@ -1,15 +1,10 @@
-﻿using AdventOfCode;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace AdventOfCode.Calendar.Day01
 {
     public class BruteForce : SolutionBase<int[]>
     {
-        public BruteForce() : base(Parsers.Lines().Int().ToArray())
-        {
-        }
+        public BruteForce() : base(Parsers.Lines().Int().ToArray()) { }
 
         public override object PartA()
         {

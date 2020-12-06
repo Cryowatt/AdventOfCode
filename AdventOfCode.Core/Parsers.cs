@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Numerics;
+using System.Text;
 
 namespace AdventOfCode
 {
@@ -50,7 +52,28 @@ namespace AdventOfCode
         public static Func<string, IEnumerable<int>> Int(this Func<string, IEnumerable<string>> parser) =>
             input => parser(input).Select(int.Parse);
 
-        public static Func<string, ReadOnlyMemory<int>> Memory(this Func<string, IEnumerable<int>> parser) =>
-            input => new ReadOnlyMemory<int>(parser(input).ToArray());
+        public static Func<string, ReadOnlyMemory<T>> Memory<T>(this Func<string, IEnumerable<T>> parser, bool vectorPadding = false)
+             where T : struct
+        {
+            if (vectorPadding)
+            {
+                return input =>
+                {
+                    var array = parser(input).ToArray();
+                    var padding = Vector<T>.Count - (array.Length % Vector<T>.Count);
+                    var paddedArray = new T[array.Length + padding];
+                    array.CopyTo(paddedArray, 0);
+                    return new ReadOnlyMemory<T>(paddedArray);
+                };
+            }
+            else
+            {
+                return input => new ReadOnlyMemory<T>(parser(input).ToArray());
+            }
+        }
+
+
+        public static Func<string, ReadOnlyMemory<char>> Raw() =>
+            input => new ReadOnlyMemory<char>(input.ToCharArray());
     }
 }

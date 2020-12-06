@@ -1,21 +1,18 @@
-﻿using System;
+﻿using AdventOfCode.Test;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AdventOfCode.Calendar.Day02
 {
-    public static class BaseTests
+    public class TestData : ITestData
     {
-        public static IEnumerable<(string Input, string Expected)> PartATests => new[]
+        public IEnumerable<(string Input, string Expected)> PartAData => new[]
         {
             ("1-3 a: abcde", "1"),
             ("1-3 b: cdefg", "0"),
             ("2-9 c: ccccccccc", "1")
         };
 
-        public static IEnumerable<(string Input, string Expected)> PartBTests => new[]
+        public IEnumerable<(string Input, string Expected)> PartBData => new[]
         {
             ("1-3 a: abcde", "1"),
             ("1-3 b: cdefg", "0"),
@@ -23,10 +20,6 @@ namespace AdventOfCode.Calendar.Day02
         };
     }
 
-    public class RegularExpressionsTests : DayTest<RegularExpressionsTests, RegularExpressions>
-    {
-        public override IEnumerable<(string Input, string Expected)> PartATests => BaseTests.PartATests;
-
-        public override IEnumerable<(string Input, string Expected)> PartBTests => BaseTests.PartBTests;
-    }
+    public class LoopsTests : DayTest<Loops, TestData> { }
+    public class LinqTests : DayTest<Linq, TestData> { }
 }

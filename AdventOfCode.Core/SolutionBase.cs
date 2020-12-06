@@ -12,7 +12,7 @@ namespace AdventOfCode
             this.parser = parser;
         }
 
-        public void Parse(string input)
+        public virtual void Parse(string input)
         {
             this.input = parser(input);
         }
