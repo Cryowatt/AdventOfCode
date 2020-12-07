@@ -32,7 +32,7 @@ namespace AdventOfCode.Calendar.Day01
                 for (int j = i + 1; j < this.input.Length; j++)
                 {
                     var b = this.input[j];
-                    for (int k = i + j + 1; k < this.input.Length; k++)
+                    for (int k = j + 1; k < this.input.Length; k++)
                     {
                         var c = this.input[k];
                         if (a + b + c == 2020)
