@@ -33,12 +33,18 @@ namespace AdventOfCode.Calendar.Day06
         public override object PartA() =>
             (from customsGroup in this.input
              let groupAnswers =
-                 (from response in customsGroup
-                  from answer in response
-                  select answer)
+                 from response in customsGroup
+                 from answer in response
+                 select answer
              select groupAnswers.Distinct().Count()).Sum();
 
 
-        public override object PartB() => "";
+        public override object PartB() =>
+            (from customsGroup in this.input
+             let groupLeader = customsGroup.First()
+             select
+                (from answer in groupLeader
+                 where customsGroup.All(o => o.Contains(answer))
+                 select answer).Count()).Sum();
     }
 }

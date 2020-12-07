@@ -27,8 +27,21 @@ b", "11"),
 
         public IEnumerable<(string Input, string Expected)> PartBData => new[]
         {
-            (@"BFFFBBFRRR
-BFFFBBFRLR", "566"),
+            (@"abc
+
+a
+b
+c
+
+ab
+ac
+
+a
+a
+a
+a
+
+b", "6"),
         };
     }
 
