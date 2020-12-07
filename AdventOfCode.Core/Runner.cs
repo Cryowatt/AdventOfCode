@@ -176,7 +176,7 @@ namespace AdventOfCode
             {
                 result = part().ToString();
             }
-            catch
+            catch(Exception e)
             {
                 result = null;
             }

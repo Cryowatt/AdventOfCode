@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Calendar\Day04\Input.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\AdventOfCode.Core\AdventOfCode.Core.csproj" />
   </ItemGroup>
 
