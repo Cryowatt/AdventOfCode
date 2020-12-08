@@ -6,45 +6,115 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Calendar.Day07
 {
-    public class Functional : SolutionBase<IEnumerable<IEnumerable<string>>>
+    public record Bag(string Modifier, string Colour)
     {
-        private static IEnumerable<IEnumerable<string>> Parser(string input)
+        public string Fullname => $"{this.Modifier} {this.Colour}";
+        public IList<ChildBag> Children { get; set; } = new List<ChildBag>();
+    }
+
+    public record ChildBag(Bag Bag, int Count);
+
+    public class Functional : SolutionBase<IReadOnlyDictionary<string, Bag>>
+    {
+        private static IReadOnlyDictionary<string, Bag> Parser(string input)
         {
+            var bagPattern = new Regex(@"(?:(?<Count>\d+) |^)(?<Fullname>(?<Modifier>\w+) (?<Colour>\w+)) bags?(?:,|.)");
+            var dictionary = new Dictionary<string, Bag>();
+
             using (var reader = new StringReader(input))
             {
                 string line;
-
-                do
+                while ((line = reader.ReadLine()) != null)
                 {
-                    var answers = new List<string>();
-                    while (!string.IsNullOrEmpty(line = reader.ReadLine()))
+                    var segments = line.Split(" contain ");
+                    var parentSegment = segments[0];
+                    var childrenSegment = segments[1];
+
+                    var parentMatch = bagPattern.Match(parentSegment);
+                    Bag parent;
+
+                    if (!dictionary.TryGetValue(parentMatch.Groups["Fullname"].Value, out parent))
                     {
-                        answers.Add(line);
+                        parent = new Bag(parentMatch.Groups["Modifier"].Value, parentMatch.Groups["Colour"].Value);
+                        dictionary.Add(parent.Fullname, parent);
                     }
 
-                    yield return answers;
+                    if (childrenSegment != "no other bags.")
+                    {
+                        var childrenMatches = bagPattern.Matches(childrenSegment);
+
+                        foreach (var match in childrenMatches.OfType<Match>())
+                        {
+                            Bag bag;
+
+                            if (!dictionary.TryGetValue(match.Groups["Fullname"].Value, out bag))
+                            {
+                                bag = new Bag(match.Groups["Modifier"].Value, match.Groups["Colour"].Value);
+                                dictionary.Add(bag.Fullname, bag);
+                            }
+
+                            var child = new ChildBag(bag, int.Parse(match.Groups["Count"].Value));
+
+                            parent.Children.Add(child);
+                        }
+                    }
                 }
-                while (line != null);
             }
+
+            return dictionary;
         }
 
         public Functional() : base(Parser) { }
 
-        public override object PartA() =>
-            (from customsGroup in this.input
-             let groupAnswers =
-                 from response in customsGroup
-                 from answer in response
-                 select answer
-             select groupAnswers.Distinct().Count()).Sum();
+        public override object PartA()
+        {
+            Dictionary<Bag, bool> cache = new Dictionary<Bag, bool>();
 
+            bool AnyChild(Bag bag, string fullname)
+            {
+                if (cache.TryGetValue(bag, out bool hasChild))
+                {
+                    return hasChild;
+                }
 
-        public override object PartB() =>
-            (from customsGroup in this.input
-             let groupLeader = customsGroup.First()
-             select
-                (from answer in groupLeader
-                 where customsGroup.All(o => o.Contains(answer))
-                 select answer).Count()).Sum();
+                foreach (var child in bag.Children)
+                {
+                    if (child.Bag.Fullname == fullname)
+                    {
+                        hasChild = true;
+                        break;
+                    }
+                    else if(AnyChild(child.Bag, fullname))
+                    {
+                        hasChild = true;
+                        break;
+                    }
+                }
+
+                cache[bag] = hasChild;
+                return hasChild;
+            }
+
+            return this.input.Values.Count(bag => AnyChild(bag, "shiny gold"));
+        }
+
+        public override object PartB()
+        {
+            Dictionary<Bag, int> cache = new Dictionary<Bag, int>();
+
+            int CountDescendants(Bag bag)
+            {
+                if (cache.TryGetValue(bag, out int descendantCount))
+                {
+                    return descendantCount;
+                }
+
+                descendantCount = bag.Children.Sum(child => child.Count * CountDescendants(child.Bag)) + 1;
+                cache[bag] = descendantCount;
+                return descendantCount;
+            }
+
+            return CountDescendants(this.input["shiny gold"]) - 1; // -1 to skip counting itself
+        }
     }
 }
