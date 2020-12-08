@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 namespace AdventOfCode.Calendar.Day07
 {
     public class Functional : SolutionBase<IEnumerable<IEnumerable<string>>>
-    { //(?<Parent>(?<ParentModifier>\w+) (?<ParentColour>\w+)) bags? contain(?: (?<Child>(?<Count>\d+) (?<Modifier>\w+) (?<Colour>\w+)) bags?(?:,|.))+
+    {
         private static IEnumerable<IEnumerable<string>> Parser(string input)
         {
             using (var reader = new StringReader(input))
