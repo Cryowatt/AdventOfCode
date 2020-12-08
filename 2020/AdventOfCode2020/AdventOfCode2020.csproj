@@ -25,6 +25,7 @@
     <None Remove="Calendar\Day05\Input.txt" />
     <None Remove="Calendar\Day06\Input.txt" />
     <None Remove="Calendar\Day07\Input.txt" />
+    <None Remove="Calendar\Day08\Input.txt" />
   </ItemGroup>
 
   <ItemGroup>
