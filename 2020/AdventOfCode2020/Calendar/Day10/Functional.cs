@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Calendar.Day10
 {
-    public unsafe class Functional : SolutionBase<IEnumerable<int>>
+    public unsafe class Pointers : SolutionBase<IEnumerable<int>>
     {
-        public Functional() : base(Parsers.Lines().Int()) { }
+        public Pointers() : base(Parsers.Lines().Int()) { }
 
         public override object PartA()
         {
