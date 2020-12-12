@@ -1,77 +1,27 @@
-﻿using AdventOfCode.Test;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace AdventOfCode.Calendar.Day09
 {
-    public class TestData : ITestData
+    public class DataStructureTest
     {
-        string Preamble = @"1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-";
-
-        public IEnumerable<(string Input, string Expected)> PartAData => new[]
+        public static IEnumerable<object[]> GetPartAData()
         {
-            (Preamble + "50", "50"),
-            (@"35
-20
-15
-25
-47
-40
-62
-55
-65
-95
-102
-117
-150
-182
-127
-219
-299
-277
-309
-576", "127")
-        };
+            var longPreamble = Enumerable.Range(1, 25).Select(o => (long)o);
+            yield return new object[] { longPreamble.Concat(new long[] { 100 }).ToArray(), 25, 100 };
+            yield return new object[] { longPreamble.Concat(new long[] { 50 }).ToArray(), 25, 50 };
+            yield return new object[] { new long[] { 35, 20, 15, 25, 47, 40, 62, 55, 65, 95, 102, 117, 150, 182, 127, 219, 299, 277, 309, 576 }, 5, 127 };
+        }
 
-        public IEnumerable<(string Input, string Expected)> PartBData => new[]
+        [Theory]
+        [MemberDataAttribute(nameof(GetPartAData))]
+        public void DataTest(long[] input, int preambleLength, int expected)
         {
-            (@"nop +0
-acc +1
-jmp +4
-acc +3
-jmp -3
-acc -99
-acc +1
-jmp -4
-acc +6", "8"),
-        };
-
-        public class VectorTest : DayTest<Vector, TestData> { }
-        public class FunctionalTest : DayTest<Functional, TestData> { }
+            var day = new DataStructures();
+            var data = new Memory<long>(input);
+            Assert.Equal(expected, day.FirstExploit(data, preambleLength));
+        }
     }
 }

@@ -52,6 +52,9 @@ namespace AdventOfCode
         public static Func<string, IEnumerable<int>> Int(this Func<string, IEnumerable<string>> parser) =>
             input => parser(input).Select(int.Parse);
 
+        public static Func<string, IEnumerable<long>> Long(this Func<string, IEnumerable<string>> parser) =>
+            input => parser(input).Select(long.Parse);
+
         public static Func<string, ReadOnlyMemory<T>> Memory<T>(this Func<string, IEnumerable<T>> parser, bool vectorPadding = false)
              where T : struct
         {
