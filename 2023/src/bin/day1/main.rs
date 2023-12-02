@@ -1,5 +1,7 @@
 #![feature(test)]
 
+use std::{cell::OnceCell, sync::OnceLock};
+
 use log::debug;
 use onig::Regex;
 
@@ -26,12 +28,14 @@ fn part1(input: &str) -> u32 {
     total
 }
 
+static NUMBER_MATCH: OnceLock<Regex> = OnceLock::new();
+
 fn part2(input: &str) -> u32 {
     let mut total = 0;
 
-    let number_match =
+    let number_match = NUMBER_MATCH.get_or_init(||
         Regex::new(r"\d|on(?=e)|tw(?=o)|thre(?=e)|four|fiv(?=e)|six|seve(?=n)|eigh(?=t)|nin(?=e)")
-            .unwrap();
+            .unwrap());
     for line in input.lines() {
         debug!("{}", line);
         let mut digits = number_match.captures_iter(line).map(|c| {
