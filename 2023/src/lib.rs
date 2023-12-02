@@ -1,7 +1,10 @@
 #![feature(test)]
 
 mod day1;
+mod day2;
+
 pub use day1::*;
+pub use day2::*;
 
 #[macro_export]
 macro_rules! day {
