@@ -1,7 +1,8 @@
 [package]
-name = "AdventOfCode"
+name = "advent_of_code"
 version = "0.1.0"
 edition = "2021"
+default-run = "advent_of_code"
 
 [[bin]]
 name = "day1"

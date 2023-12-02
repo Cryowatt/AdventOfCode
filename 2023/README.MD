@@ -1,10 +1,9 @@
-To run the code:
+To run everything:
 ```bash
-cargo run --release --bin day(n)
+cargo run
 ```
 
-So for day1 run.
-
+To run a day, for example day1:
 ```bash
 cargo run --release --bin day1
 ```
