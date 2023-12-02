@@ -5,7 +5,7 @@ edition = "2021"
 default-run = "advent_of_code"
 
 [[bin]]
-name = "day1"
+name = "day"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
