@@ -5,9 +5,16 @@ use onig::Regex;
 
 pub struct Day1;
 
-impl Day1{
+impl Day1 {
     pub const INPUT: &str = include_str!("input.txt");
 
+    /// ```rust
+    /// let input = r"1abc2
+    /// pqr3stu8vwx
+    /// a1b2c3d4e5f
+    /// treb7uchet";
+    /// assert_eq!(142, advent_of_code::Day1::part1(input));
+    /// ```
     pub fn part1(input: &str) -> u32 {
         let mut total = 0;
         for line in input.lines() {
@@ -22,17 +29,29 @@ impl Day1{
         total
     }
 
-    
+    /// ```rust
+    /// let input = r"two1nine
+    /// eightwothree
+    /// abcone2threexyz
+    /// xtwone3four
+    /// 4nineeightseven2
+    /// zoneight234
+    /// 7pqrstsixteen";
+    /// assert_eq!(281, advent_of_code::Day1::part2(input));
+    /// ```
     pub fn part2(input: &str) -> u32 {
-        static NUMBER_MATCH: OnceLock<Regex> = OnceLock::new();
+        static NUMBER_PARSER: OnceLock<Regex> = OnceLock::new();
         let mut total = 0;
 
-        let number_match = NUMBER_MATCH.get_or_init(||
-            Regex::new(r"\d|on(?=e)|tw(?=o)|thre(?=e)|four|fiv(?=e)|six|seve(?=n)|eigh(?=t)|nin(?=e)")
-                .unwrap());
+        let number_parser = NUMBER_PARSER.get_or_init(|| {
+            Regex::new(
+                r"\d|on(?=e)|tw(?=o)|thre(?=e)|four|fiv(?=e)|six|seve(?=n)|eigh(?=t)|nin(?=e)",
+            )
+            .unwrap()
+        });
         for line in input.lines() {
             debug!("{}", line);
-            let mut digits = number_match.captures_iter(line).map(|c| {
+            let mut digits = number_parser.captures_iter(line).map(|c| {
                 let number = c.at(0).unwrap();
                 debug!("number: {}", number);
 
@@ -65,32 +84,6 @@ impl Day1{
 mod unittests {
     use crate::Day1;
 
-    #[ctor::ctor]
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
-
-    #[test]
-    fn part1_example_test() {
-        let input = r"1abc2
-        pqr3stu8vwx
-        a1b2c3d4e5f
-        treb7uchet";
-        assert_eq!(142, Day1::part1(input));
-    }
-
-    #[test]
-    fn part2_example_test() {
-        let input = r"two1nine
-        eightwothree
-        abcone2threexyz
-        xtwone3four
-        4nineeightseven2
-        zoneight234
-        7pqrstsixteen";
-        assert_eq!(281, Day1::part2(input));
-    }
-
     #[test]
     fn part2_overlap_case() {
         let input = r"two1nine
@@ -107,17 +100,17 @@ mod unittests {
 
 #[cfg(test)]
 mod bench {
-    use crate::Day1;
+    use crate::Day1 as Day;
 
     extern crate test;
 
     #[bench]
     fn part1_bench(b: &mut test::Bencher) {
-        b.iter(|| test::black_box(Day1::part1(Day1::INPUT)));
+        b.iter(|| test::black_box(Day::part1(Day::INPUT)));
     }
 
     #[bench]
     fn part2_bench(b: &mut test::Bencher) {
-        b.iter(|| test::black_box(Day1::part2(Day1::INPUT)));
+        b.iter(|| test::black_box(Day::part2(Day::INPUT)));
     }
 }
