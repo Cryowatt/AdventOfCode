@@ -1,0 +1,4 @@
+[alias]     # command aliases
+all = "run"
+day = "run --bin day"
+ci = "watch -x test"
