@@ -1,6 +1,6 @@
 [alias]     # command aliases
 all = "run"
 day = "run --bin day"
-ci = "watch --clear -x test"
+ci = "watch --clear -x test -x bench -x run"
 wb = "watch --clear -x bench"
 everything-forever = "watch --clear -x test -x run -x bench"
