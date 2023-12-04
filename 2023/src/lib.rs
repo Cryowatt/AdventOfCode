@@ -1,4 +1,5 @@
 #![feature(ascii_char)]
+#![feature(extend_one)]
 #![feature(int_roundings)]
 #![feature(test)]
 
