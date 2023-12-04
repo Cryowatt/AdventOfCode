@@ -1,5 +1,5 @@
-#![feature(int_roundings)]
 #![feature(ascii_char)]
+#![feature(int_roundings)]
 #![feature(test)]
 
 pub mod day1;
@@ -78,6 +78,22 @@ macro_rules! advent_day {
             #[bench]
             fn part2_bench(b: &mut test::Bencher) {
                 b.iter(|| test::black_box(Day::part2(Day::INPUT)));
+            }
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! advent_bench {
+    ($module:ident::$part1_func:ident) => {
+        #[cfg(test)]
+        mod $module {
+            extern crate test;
+
+            #[bench]
+            fn bench(b: &mut test::Bencher) {
+                pub const INPUT: &str = include_str!("input.txt");
+                b.iter(|| test::black_box(super::$part1_func(INPUT)));
             }
         }
     };
