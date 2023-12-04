@@ -1,4 +1,7 @@
-use std::{collections::HashSet, ops::Sub};
+use std::{
+    collections::{HashSet, VecDeque},
+    ops::Sub,
+};
 
 use crate::{advent_bench, advent_day};
 
@@ -71,8 +74,34 @@ pub fn part1(input: &str) -> u32 {
 /// Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
 /// Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
 /// Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
-/// //assert_eq!(467835, part2(input));
+/// assert_eq!(30, part2(input));
 /// ```
-pub fn part2(_input: &str) -> u32 {
-    0
+pub fn part2(input: &str) -> u32 {
+    let mut copies_state: VecDeque<u32> = VecDeque::<u32>::new();
+    input
+        .lines()
+        .map(|line| {
+            let (_, numbers) = line.split_once(":").unwrap();
+            let (winning_numbers, played_numbers) = numbers.split_once('|').unwrap();
+            let winning_numbers: HashSet<u32> = winning_numbers
+                .split_whitespace()
+                .map(|number| number.parse::<u32>().unwrap())
+                .collect();
+            played_numbers
+                .split_whitespace()
+                .map(|number| number.parse::<u32>().unwrap())
+                .filter(|number| winning_numbers.contains(number))
+                .count() as u32
+        })
+        .fold(0, |acc, wins| {
+            let win_copies = copies_state.pop_front().unwrap_or_default() + 1;
+
+            for i in 0..wins {
+                match copies_state.get(i as usize) {
+                    Some(copies) => copies_state[i as usize] = win_copies + copies,
+                    None => copies_state.push_back(win_copies),
+                };
+            }
+            acc + win_copies
+        })
 }
