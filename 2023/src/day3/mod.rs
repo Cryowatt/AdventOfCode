@@ -1,8 +1,26 @@
 use crate::{advent_day, UPoint};
 
-advent_day!(Day3, part1, part2);
+advent_day!(Day3, parse, Grid<'_>, part1, part2);
 
-struct Grid<'a> {
+pub fn parse<'a>(input: &'a str) -> Grid<'a> {
+    let width = input.find(['\r', '\n']).unwrap();
+    let terminator_length = input
+        .get(width..)
+        .unwrap()
+        .find(|c: char| !c.is_whitespace())
+        .unwrap();
+    let stride = width + terminator_length;
+    let height = input.len().div_ceil(stride);
+
+    Grid {
+        cells: input.as_bytes(),
+        width: width as u32,
+        height: height as u32,
+        stride: stride as u32,
+    }
+}
+
+pub struct Grid<'a> {
     cells: &'a [u8],
     width: u32,
     height: u32,
@@ -40,8 +58,8 @@ impl<'a> Grid<'a> {
 
     fn read_number(&self, position: UPoint, length: usize) -> u32 {
         let offset = (position.y * self.stride) + position.x;
-        let mut num:u32 = 0;
-        for cell in &self.cells[offset as usize..(offset as usize +length)] {
+        let mut num: u32 = 0;
+        for cell in &self.cells[offset as usize..(offset as usize + length)] {
             num = num * 10 + ((*cell) as char).to_digit(10).unwrap()
         }
         num
@@ -82,7 +100,8 @@ fn part_number(grid: &Grid, position: UPoint) -> Option<u32> {
 
 /// ```rust
 /// use advent_of_code::day3::*;
-/// let input = r"467..114..
+/// let input = parse(
+/// r"467..114..
 /// ...*......
 /// ..35..633.
 /// ......#...
@@ -91,25 +110,14 @@ fn part_number(grid: &Grid, position: UPoint) -> Option<u32> {
 /// ..592.....
 /// ......755.
 /// ...$.*....
-/// .664.598..";
-/// assert_eq!(4361, part1(input));
+/// .664.598..");
+/// assert_eq!(4361, part1(&input));
 /// ```
-pub fn part1(input: &str) -> u32 {
-    let width = input.find('\n').unwrap();
-    let stride = width + 1;
-    let height = input.len().div_ceil(width + 1);
-
-    let grid = Grid {
-        cells: input.as_bytes(),
-        width: width as u32,
-        height: height as u32,
-        stride: stride as u32,
-    };
-
+pub fn part1(grid: &Grid<'_>) -> u32 {
     let mut sum = 0;
 
-    for y in 0..height {
-        for x in 0..width {
+    for y in 0..grid.height {
+        for x in 0..grid.width {
             let here = UPoint::new(x as u32, y as u32);
 
             if grid.has_symbol_at(here) {
@@ -141,7 +149,8 @@ pub fn part1(input: &str) -> u32 {
 
 /// ```rust
 /// use advent_of_code::day3::*;
-/// let input = r"467..114..
+/// let input = parse(
+/// r"467..114..
 /// ...*......
 /// ..35..633.
 /// ......#...
@@ -150,25 +159,14 @@ pub fn part1(input: &str) -> u32 {
 /// ..592.....
 /// ......755.
 /// ...$.*....
-/// .664.598..";
-/// assert_eq!(467835, part2(input));
+/// .664.598..");
+/// assert_eq!(467835, part2(&input));
 /// ```
-pub fn part2(input: &str) -> u32 {
-    let width = input.find('\n').unwrap();
-    let stride = width + 1;
-    let height = input.len().div_ceil(width + 1);
-
-    let grid = Grid {
-        cells: input.as_bytes(),
-        width: width as u32,
-        height: height as u32,
-        stride: stride as u32,
-    };
-    
+pub fn part2(grid: &Grid<'_>) -> u32 {
     let mut sum = 0;
 
-    for y in 0..height {
-        for x in 0..width {
+    for y in 0..grid.height {
+        for x in 0..grid.width {
             let here = UPoint::new(x as u32, y as u32);
 
             if grid.has_gear_at(here) {
@@ -186,8 +184,7 @@ pub fn part2(input: &str) -> u32 {
                                 checks[1] = check_cell(pos.left());
                                 checks[2] = check_cell(pos.right())
                             }
-                        }
-                    );
+                        });
                     }
                 };
 
