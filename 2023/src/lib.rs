@@ -46,28 +46,33 @@ impl UPoint {
 #[macro_export]
 macro_rules! run_day {
     ($id:literal, $day:path) => {
+        let input = <$day>::parse(<$day>::INPUT);
         println!(
             "Day {}# [{:<10}] [{:<10}]",
             $id,
-            <$day>::part1(<$day>::INPUT),
-            <$day>::part2(<$day>::INPUT)
+            <$day>::part1(&input),
+            <$day>::part2(&input)
         );
     };
 }
 
 #[macro_export]
 macro_rules! advent_day {
-    ($day:ident, $part1_func:expr, $part2_func:expr) => {
+    ($day:ident, $parser:expr, $input_type:ty, $part1_func:expr, $part2_func:expr) => {
         pub struct $day;
 
         impl $day {
-            pub const INPUT: &str = include_str!("input.txt");
+            pub const INPUT: &'static str = include_str!("input.txt");
 
-            pub fn part1(input: &str) -> u32 {
+            pub fn parse(input: &str) -> $input_type {
+                $parser(input)
+            }
+
+            pub fn part1(input: &$input_type) -> u32 {
                 $part1_func(input)
             }
 
-            pub fn part2(input: &str) -> u32 {
+            pub fn part2(input: &$input_type) -> u32 {
                 $part2_func(input)
             }
         }
@@ -80,12 +85,14 @@ macro_rules! advent_day {
 
             #[bench]
             fn part1_bench(b: &mut test::Bencher) {
-                b.iter(|| test::black_box(Day::part1(Day::INPUT)));
+                let input = Day::parse(Day::INPUT);
+                b.iter(|| test::black_box(Day::part1(&input)));
             }
 
             #[bench]
             fn part2_bench(b: &mut test::Bencher) {
-                b.iter(|| test::black_box(Day::part2(Day::INPUT)));
+                let input = Day::parse(Day::INPUT);
+                b.iter(|| test::black_box(Day::part2(&input)));
             }
         }
     };
@@ -93,15 +100,15 @@ macro_rules! advent_day {
 
 #[macro_export]
 macro_rules! advent_bench {
-    ($module:ident::$part1_func:ident) => {
+    ($parser:ident, $input_type:ty, $module:ident::$part1_func:ident) => {
         #[cfg(test)]
         mod $module {
             extern crate test;
 
             #[bench]
             fn bench(b: &mut test::Bencher) {
-                pub const INPUT: &str = include_str!("input.txt");
-                b.iter(|| test::black_box(super::$part1_func(INPUT)));
+                let input = super::$parser(include_str!("input.txt"));
+                b.iter(|| test::black_box(super::$part1_func(input)));
             }
         }
     };

@@ -2,27 +2,32 @@ use std::sync::OnceLock;
 
 use crate::advent_day;
 
-advent_day!(Day2, part1, part2);
+advent_day!(Day2, parse, Vec<&str>, part1, part2);
+
+pub fn parse(input: &str) -> Vec<&str> {
+    input.lines().collect()
+}
 
 /// ```rust
-/// let input = r"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+/// use advent_of_code::day2::*;
+/// let input = parse(
+/// r"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 /// Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 /// Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 /// Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
-/// Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
-/// assert_eq!(8, advent_of_code::Day2::part1(input));
+/// Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green");
+/// assert_eq!(8, part1(&input));
 /// ```
-pub fn part1(input: &str) -> u32 {
+pub fn part1(input: &Vec<&str>) -> u32 {
     static LINE_PARSER: OnceLock<regex::Regex> = OnceLock::new();
     static COLOUR_PARSER: OnceLock<regex::Regex> = OnceLock::new();
 
-    let line_parser =
-        LINE_PARSER.get_or_init(|| regex::Regex::new(r"Game (\d+): (.*)").unwrap());
+    let line_parser = LINE_PARSER.get_or_init(|| regex::Regex::new(r"Game (\d+): (.*)").unwrap());
     let colour_parser =
         COLOUR_PARSER.get_or_init(|| regex::Regex::new(r"(\d\d+) (red|green|blue)").unwrap());
 
     input
-        .lines()
+        .iter()
         .filter_map(|line| {
             let (_, [id, rounds]) = line_parser.captures(line).unwrap().extract();
 
@@ -45,14 +50,16 @@ pub fn part1(input: &str) -> u32 {
 }
 
 /// ```rust
-/// let input = r"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+/// use advent_of_code::day2::*;
+/// let input = parse(
+/// r"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 /// Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 /// Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 /// Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
-/// Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green";
-/// assert_eq!(2286, advent_of_code::Day2::part2(input));
+/// Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green");
+/// assert_eq!(2286, part2(&input));
 /// ```
-pub fn part2(input: &str) -> u32 {
+pub fn part2(input: &Vec<&str>) -> u32 {
     static COLOUR_PARSER: OnceLock<regex::Regex> = OnceLock::new();
 
     let colour_parser =
@@ -98,7 +105,7 @@ pub fn part2(input: &str) -> u32 {
     }
 
     input
-        .lines()
+        .iter()
         .map(|line| {
             let min_dice_set =
                 colour_parser
