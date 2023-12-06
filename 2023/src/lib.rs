@@ -108,7 +108,7 @@ macro_rules! advent_bench {
             #[bench]
             fn bench(b: &mut test::Bencher) {
                 let input = super::$parser(include_str!("input.txt"));
-                b.iter(|| test::black_box(super::$part1_func(input)));
+                b.iter(|| test::black_box(super::$part1_func(&input)));
             }
         }
     };

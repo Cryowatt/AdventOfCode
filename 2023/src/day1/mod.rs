@@ -1,10 +1,11 @@
-use std::sync::OnceLock;
+use std::{cmp::Ordering, sync::OnceLock};
 
 use log::debug;
 
-use crate::advent_day;
+use crate::{advent_bench, advent_day};
 
 advent_day!(Day1, parse, Vec<&str>, part1, part2);
+advent_bench!(parse, Vec<&str>, regex_part2::part2_regex);
 
 pub fn parse(input: &str) -> Vec<&str> {
     input.lines().collect()
@@ -43,9 +44,9 @@ pub fn part1(input: &Vec<&str>) -> u32 {
 /// 4nineeightseven2
 /// zoneight234
 /// 7pqrstsixteen");
-/// assert_eq!(281, part2(&input));
+/// assert_eq!(281, part2_regex(&input));
 /// ```
-pub fn part2(input: &Vec<&str>) -> u32 {
+pub fn part2_regex(input: &Vec<&str>) -> u32 {
     static NUMBER_PARSER: OnceLock<regex::Regex> = OnceLock::new();
     let mut total = 0;
 
@@ -81,6 +82,71 @@ pub fn part2(input: &Vec<&str>) -> u32 {
     }
 
     total
+}
+
+/// ```rust
+/// use advent_of_code::day1::*;
+/// let input = parse(
+/// r"two1nine
+/// eightwothree
+/// abcone2threexyz
+/// xtwone3four
+/// 4nineeightseven2
+/// zoneight234
+/// 7pqrstsixteen");
+/// assert_eq!(281, part2(&input));
+/// ```
+pub fn part2(input: &Vec<&str>) -> u32 {
+    const DIGITS: [(&str, u32); 18] = [
+        ("1", 1),
+        ("2", 2),
+        ("3", 3),
+        ("4", 4),
+        ("5", 5),
+        ("6", 6),
+        ("7", 7),
+        ("8", 8),
+        ("9", 9),
+        ("eight", 8),
+        ("five", 5),
+        ("four", 4),
+        ("nine", 9),
+        ("one", 1),
+        ("seven", 7),
+        ("six", 6),
+        ("three", 3),
+        ("two", 2),
+    ];
+
+    fn digit_search(segment: &str) -> Option<u32> {
+        DIGITS
+            .binary_search_by(|item| {
+                if segment.starts_with(item.0) {
+                    Ordering::Equal
+                } else {
+                    item.0.cmp(segment)
+                }
+            })
+            .map_or(None, |index| Some(DIGITS.get(index).unwrap().1))
+    }
+
+    input
+        .iter()
+        .map(|line| {
+            let first = (0..line.len())
+                .filter_map(|i| digit_search(&line[i..]))
+                .nth(0)
+                .unwrap();
+
+            let last = (0..line.len())
+                .rev()
+                .filter_map(|i| digit_search(&line[i..]))
+                .nth(0)
+                .unwrap();
+
+            (first * 10) + last
+        })
+        .sum()
 }
 
 #[cfg(test)]

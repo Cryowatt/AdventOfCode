@@ -205,7 +205,7 @@ pub fn part1(input: &SeedMaps) -> u32 {
 /// assert_eq!(46, part2(&input));
 /// ```
 pub fn part2(input: &SeedMaps) -> u32 {
-    let mut seed_ranges: Vec<RangeInclusive<u32>> = input
+    let seed_ranges: Vec<RangeInclusive<u32>> = input
         .seeds
         .chunks_exact(2)
         .map(|chunk| chunk[0]..=(chunk[0] + (chunk[1] - 1)))
