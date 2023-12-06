@@ -1,6 +1,7 @@
 #![feature(ascii_char)]
 #![feature(extend_one)]
 #![feature(int_roundings)]
+#![feature(isqrt)]
 #![feature(test)]
 
 pub mod day1;
