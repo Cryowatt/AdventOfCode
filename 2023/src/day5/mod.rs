@@ -1,6 +1,6 @@
 use std::{cmp::Ordering, ops::RangeInclusive};
 
-use crate::advent_day;
+use advent::*;
 
 advent_day!(Day5, parse, SeedMaps, part1, part2);
 
@@ -99,7 +99,7 @@ pub struct SeedMaps {
 }
 
 /// ```rust
-/// use advent_of_code::day5::*;
+/// use advent_of_code_2023::day5::*;
 /// let input = parse(
 /// r"seeds: 79 14 55 13
 ///
@@ -167,7 +167,7 @@ pub fn part1(input: &SeedMaps) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code::day5::*;
+/// use advent_of_code_2023::day5::*;
 /// let input = parse(
 /// r"seeds: 79 14 55 13
 ///
