@@ -1,8 +1,4 @@
-use std::{cmp::Ordering, ops::Div, sync::OnceLock};
-
-use log::debug;
-
-use crate::{advent_bench, advent_day};
+use crate::advent_day;
 
 advent_day!(Day6, parse, Vec<BoatRace>, part1, part2);
 
@@ -51,8 +47,24 @@ pub fn part1(input: &Vec<BoatRace>) -> u32 {
 /// let input = parse(
 /// r"Time:      7  15   30
 /// Distance:  9  40  200");
-/// //assert_eq!(420, part2(&input));
+/// assert_eq!(71503, part2(&input));
 /// ```
 pub fn part2(input: &Vec<BoatRace>) -> u32 {
-    0
+    let mut time_string = String::new();
+    let mut distance_string = String::new();
+
+    for race in input {
+        time_string.push_str(race.time.to_string().as_str());
+        distance_string.push_str(race.distance.to_string().as_str());
+    }
+
+    let time = time_string.parse::<u64>().unwrap();
+    let distance = distance_string.parse::<u64>().unwrap();
+    let half_time = time / 2;
+    let remainder = time % 2;
+    let wins = (1..=half_time)
+        .filter(|hold_time| distance < hold_time * (time - hold_time))
+        .count() as u64;
+    println!("{}", (wins * 2) - (1 - remainder));
+    ((wins * 2) - (1 - remainder)) as u32
 }
