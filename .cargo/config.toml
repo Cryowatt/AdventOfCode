@@ -1,0 +1,17 @@
+[alias] # command aliases
+all = "run"
+day = "run --bin day"
+ci = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc",
+    "-x",
+    "run --bin advent_of_code_2015",
+    "-x",
+    "run --bin advent_of_code_2023",
+    "-x",
+    "bench",
+]
+wb = "watch --clear -x bench"
+everything-forever = "watch --clear -x test -x run -x bench"

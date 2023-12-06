@@ -1,4 +1,4 @@
-use crate::{advent_day, UPoint};
+use advent::*;
 
 advent_day!(Day3, parse, Grid<'_>, part1, part2);
 
@@ -99,7 +99,7 @@ fn part_number(grid: &Grid, position: UPoint) -> Option<u32> {
 }
 
 /// ```rust
-/// use advent_of_code::day3::*;
+/// use advent_of_code_2023::day3::*;
 /// let input = parse(
 /// r"467..114..
 /// ...*......
@@ -148,7 +148,7 @@ pub fn part1(grid: &Grid<'_>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code::day3::*;
+/// use advent_of_code_2023::day3::*;
 /// let input = parse(
 /// r"467..114..
 /// ...*......

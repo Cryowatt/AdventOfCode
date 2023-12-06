@@ -3,7 +3,7 @@ use std::{
     ops::Sub,
 };
 
-use crate::{advent_bench, advent_day};
+use advent::*;
 
 advent_day!(Day4, parse, Vec<Card>, part1, part2);
 advent_bench!(raw, &str, cursed::part1_cursed);
@@ -39,7 +39,7 @@ pub struct Card {
 }
 
 /// ```rust
-/// use advent_of_code::day4::*;
+/// use advent_of_code_2023::day4::*;
 /// let input = r"Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 /// Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
 /// Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
@@ -63,7 +63,7 @@ pub fn part1_cursed(input: &str) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code::day4::*;
+/// use advent_of_code_2023::day4::*;
 /// let input = parse(
 /// r"Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 /// Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
@@ -87,7 +87,7 @@ pub fn part1(input: &Vec<Card>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code::day4::*;
+/// use advent_of_code_2023::day4::*;
 /// let input = parse(
 /// r"Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 /// Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19

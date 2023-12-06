@@ -1,8 +1,7 @@
 use std::{cmp::Ordering, sync::OnceLock};
 
+use advent::*;
 use log::debug;
-
-use crate::{advent_bench, advent_day};
 
 advent_day!(Day1, parse, Vec<&str>, part1, part2);
 advent_bench!(parse, Vec<&str>, regex_part2::part2_regex);
@@ -12,7 +11,7 @@ pub fn parse(input: &str) -> Vec<&str> {
 }
 
 /// ```rust
-/// use advent_of_code::day1::*;
+/// use advent_of_code_2023::day1::*;
 /// let input = parse(
 /// r"1abc2
 /// pqr3stu8vwx
@@ -35,7 +34,7 @@ pub fn part1(input: &Vec<&str>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code::day1::*;
+/// use advent_of_code_2023::day1::*;
 /// let input = parse(
 /// r"two1nine
 /// eightwothree
@@ -85,7 +84,7 @@ pub fn part2_regex(input: &Vec<&str>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code::day1::*;
+/// use advent_of_code_2023::day1::*;
 /// let input = parse(
 /// r"two1nine
 /// eightwothree
@@ -151,8 +150,6 @@ pub fn part2(input: &Vec<&str>) -> u32 {
 
 #[cfg(test)]
 mod unittests {
-    use crate::Day1;
-
     #[test]
     fn part2_overlap_case() {
         let input = r"two1nine
@@ -163,6 +160,6 @@ mod unittests {
             zoneight234
             7pqrstsixteen
             eighthree";
-        assert_eq!(281 + 83, Day1::part2(&Day1::parse(input)));
+        assert_eq!(281 + 83, super::part2(&super::parse(input)));
     }
 }
