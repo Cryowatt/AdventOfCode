@@ -26,6 +26,9 @@ fn main() {
         5 => {
             run_day!(5, advent_of_code::Day5);
         }
+        6 => {
+            run_day!(6, advent_of_code::Day6);
+        }
         _ => unimplemented!(),
     }
 }
