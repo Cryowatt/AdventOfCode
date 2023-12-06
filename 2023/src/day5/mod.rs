@@ -1,11 +1,6 @@
-use std::{
-    cmp::Ordering,
-    cmp::PartialOrd,
-    collections::btree_map,
-    ops::{Range, RangeInclusive},
-};
+use std::{cmp::Ordering, ops::RangeInclusive};
 
-use crate::{advent_bench, advent_day};
+use crate::advent_day;
 
 advent_day!(Day5, parse, SeedMaps, part1, part2);
 
@@ -82,6 +77,16 @@ struct RangeMap {
     offset: u32,
 }
 
+impl RangeMap {
+    fn contains(&self, location: &u32) -> bool {
+        self.range.contains(location)
+    }
+
+    fn offset(&self, location: u32) -> u32 {
+        location.wrapping_add(self.offset)
+    }
+}
+
 pub struct SeedMaps {
     seeds: Vec<u32>,
     seed_to_soil: Vec<RangeMap>,
@@ -154,7 +159,7 @@ pub fn part1(input: &SeedMaps) -> u32 {
                         probe.range.start().cmp(&loc)
                     }
                 })
-                .map_or(loc, |index| loc.wrapping_add(map[index].offset))
+                .map_or(loc, |index| map[index].offset(loc))
             })
         })
         .min()
@@ -197,9 +202,103 @@ pub fn part1(input: &SeedMaps) -> u32 {
 /// humidity-to-location map:
 /// 60 56 37
 /// 56 93 4");
-/// //assert_eq!(13, part1(&input));
+/// assert_eq!(46, part2(&input));
 /// ```
 pub fn part2(input: &SeedMaps) -> u32 {
-    0
-    // unimplemented!()
+    let mut seed_ranges: Vec<RangeInclusive<u32>> = input
+        .seeds
+        .chunks_exact(2)
+        .map(|chunk| chunk[0]..=(chunk[0] + (chunk[1] - 1)))
+        .collect();
+
+    let location_map = |locations: Vec<RangeInclusive<u32>>,
+                        map: &Vec<RangeMap>|
+     -> Vec<RangeInclusive<u32>> {
+        locations
+            .iter()
+            .flat_map(|location_range| {
+                let start_index = map
+                    .binary_search_by(|probe| {
+                        if probe.contains(location_range.start()) {
+                            Ordering::Equal
+                        } else {
+                            probe.range.start().cmp(location_range.start())
+                        }
+                    })
+                    .map_or_else(|index| index, |index| index);
+
+                let mut new_ranges = Vec::new();
+                let mut remaining_range = location_range.clone();
+                let mut maps = map.get(start_index..).unwrap().iter();
+
+                while !remaining_range.is_empty() {
+                    match maps.next() {
+                        Some(map_range) => {
+                            if map_range.range.contains(remaining_range.start())
+                                && map_range.range.contains(remaining_range.end())
+                            {
+                                // Fully contained, push all+offset
+                                new_ranges.push(
+                                    map_range.offset(*remaining_range.start())
+                                        ..=map_range.offset(*remaining_range.end()),
+                                );
+                                break;
+                                // remaining_range = *seed_range.end()..=*seed_range.end();
+                            } else if map_range.range.contains(remaining_range.start()) {
+                                // Seed head overlaps map tail, push head+offset
+                                new_ranges.push(
+                                    map_range.offset(*remaining_range.start())
+                                        ..=map_range.offset(*map_range.range.end()),
+                                );
+                                // Remainder tail
+                                remaining_range =
+                                    (map_range.range.end() + 1)..=*remaining_range.end();
+                            } else if map_range.range.contains(remaining_range.end()) {
+                                // Seed tail overlaps map head, push head and tail+offset
+                                new_ranges
+                                    .push(*remaining_range.start()..=(map_range.range.start() - 1));
+                                new_ranges.push(
+                                    map_range.offset(*map_range.range.start())
+                                        ..=map_range.offset(*remaining_range.end()),
+                                );
+                                break;
+                            } else if remaining_range.contains(map_range.range.start())
+                                && remaining_range.contains(map_range.range.end())
+                            {
+                                // Seed overlaps map, push head, body+offset
+                                new_ranges
+                                    .push(*remaining_range.start()..=(map_range.range.start() - 1));
+                                new_ranges.push(
+                                    map_range.offset(*map_range.range.start())
+                                        ..=map_range.offset(*map_range.range.end()),
+                                );
+                                // Remainder tail
+                                remaining_range =
+                                    (map_range.range.end() + 1)..=*remaining_range.end();
+                            }
+                        }
+                        None => {
+                            new_ranges.push(remaining_range);
+                            break;
+                        }
+                    }
+                }
+
+                new_ranges
+            })
+            .collect()
+    };
+
+    let soil_ranges = location_map(seed_ranges, &input.seed_to_soil);
+    let fertilizer_ranges = location_map(soil_ranges, &input.soil_to_fertilizer);
+    let water_ranges = location_map(fertilizer_ranges, &input.fertilizer_to_water);
+    let light_ranges = location_map(water_ranges, &input.water_to_light);
+    let temperature_ranges = location_map(light_ranges, &input.light_to_temperature);
+    let humidity_ranges = location_map(temperature_ranges, &input.temperature_to_humidity);
+    let location_ranges = location_map(humidity_ranges, &input.humidity_to_location);
+    location_ranges
+        .iter()
+        .map(|location| *location.start())
+        .min()
+        .unwrap()
 }
