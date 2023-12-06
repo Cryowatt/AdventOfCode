@@ -4,20 +4,27 @@ advent_day!(Day6, parse, Vec<BoatRace>, part1, part2);
 
 pub struct BoatRace {
     time: u32,
+    meta_time_length: u32,
     distance: u32,
+    meta_distance_length: u32,
 }
 
 pub fn parse(input: &str) -> Vec<BoatRace> {
     let mut rows = input.lines().map(|line| {
         line.split_whitespace()
             .skip(1)
-            .map(|value| value.parse::<u32>().unwrap())
+            .map(|value| (value.parse::<u32>().unwrap(), value.len() as u32))
     });
     let time = rows.next().unwrap();
     let distance = rows.next().unwrap();
 
     time.zip(distance)
-        .map(|(time, distance)| BoatRace { time, distance })
+        .map(|(time, distance)| BoatRace {
+            time: time.0,
+            meta_time_length: time.1,
+            distance: distance.0,
+            meta_distance_length: distance.1,
+        })
         .collect()
 }
 
@@ -32,12 +39,10 @@ pub fn part1(input: &Vec<BoatRace>) -> u32 {
     input
         .iter()
         .map(|race| {
-            let half_time = race.time / 2;
-            let remainder = race.time % 2;
-            let wins = (1..=half_time)
-                .filter(|hold_time| race.distance < hold_time * (race.time - hold_time))
-                .count() as u32;
-            (wins * 2) - (1 - remainder)
+            let time = race.time as f64;
+            let target = (race.distance + 1) as f64;
+            let quad = (-time + (time.powi(2) - (-4.0 * -target)).sqrt()) / -2.0;
+            ((time + 1.0) - quad.ceil() * 2.0) as u32
         })
         .product()
 }
@@ -50,21 +55,15 @@ pub fn part1(input: &Vec<BoatRace>) -> u32 {
 /// assert_eq!(71503, part2(&input));
 /// ```
 pub fn part2(input: &Vec<BoatRace>) -> u32 {
-    let mut time_string = String::new();
-    let mut distance_string = String::new();
+    let (time, distance) = input.iter().fold((0, 0), |acc, race| {
+        (
+            acc.0 * (10u64.pow(race.meta_time_length as u32)) as u64 + race.time as u64,
+            acc.1 * (10u64.pow(race.meta_distance_length as u32)) as u64 + race.distance as u64,
+        )
+    });
 
-    for race in input {
-        time_string.push_str(race.time.to_string().as_str());
-        distance_string.push_str(race.distance.to_string().as_str());
-    }
-
-    let time = time_string.parse::<u64>().unwrap();
-    let distance = distance_string.parse::<u64>().unwrap();
-    let half_time = time / 2;
-    let remainder = time % 2;
-    let wins = (1..=half_time)
-        .filter(|hold_time| distance < hold_time * (time - hold_time))
-        .count() as u64;
-    println!("{}", (wins * 2) - (1 - remainder));
-    ((wins * 2) - (1 - remainder)) as u32
+    let time = time as f64;
+    let target = (distance + 1) as f64;
+    let quad = (-time + (time.powi(2) - (-4.0 * -target)).sqrt()) / -2.0;
+    ((time + 1.0) - quad.ceil() * 2.0) as u32
 }
