@@ -46,9 +46,9 @@ pub fn parse(input: &str) -> &str {
 /// use advent_of_code_2015::day1::*;
 /// ```
 pub fn part1(input: &str) -> i32 {
-    input.chars().fold(0, |floor, c| match c {
-        '(' => floor + 1,
-        ')' => floor - 1,
+    input.bytes().fold(0, |floor, c| match c {
+        b'(' => floor + 1,
+        b')' => floor - 1,
         _ => unreachable!(),
     })
 }
@@ -63,11 +63,11 @@ pub fn part1(input: &str) -> i32 {
 /// ```
 pub fn part2(input: &str) -> u32 {
     input
-        .chars()
+        .bytes()
         .scan(0, |floor, c| {
             match c {
-                '(' => *floor += 1,
-                ')' => *floor -= 1,
+                b'(' => *floor += 1,
+                b')' => *floor -= 1,
                 _ => unreachable!(),
             };
             Some(*floor)

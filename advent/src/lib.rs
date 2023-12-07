@@ -76,11 +76,12 @@ macro_rules! advent_day {
 
 #[macro_export]
 macro_rules! advent_bench {
-    ($parser:ident, $input_type:ty, $module:ident::$part1_func:ident) => {
+    ($parser:ident, $module:ident::$part1_func:ident) => {
         #[cfg(test)]
         mod $module {
             extern crate test;
 
+            #[cfg(feature = "cursed")]
             #[bench]
             fn bench(b: &mut test::Bencher) {
                 let input = super::$parser(include_str!("input.txt"));
