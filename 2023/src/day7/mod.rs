@@ -140,11 +140,12 @@ pub fn part1(input: &Vec<CamelHand>) -> u32 {
 /// KK677 28
 /// KTJJT 220
 /// QQQJA 483");
-/// // assert_eq!(71503, part2(&input));
+/// assert_eq!(5905, part2(&input));
 /// ```
 pub fn part2(input: &Vec<CamelHand>) -> u32 {
     const fn card_value(card: u8) -> u8 {
         match card {
+            b'J' => 0x1,
             b'2' => 0x2,
             b'3' => 0x3,
             b'4' => 0x4,
@@ -154,7 +155,6 @@ pub fn part2(input: &Vec<CamelHand>) -> u32 {
             b'8' => 0x8,
             b'9' => 0x9,
             b'T' => 0xA,
-            b'J' => 0xB,
             b'Q' => 0xC,
             b'K' => 0xD,
             b'A' => 0xE,
@@ -162,29 +162,64 @@ pub fn part2(input: &Vec<CamelHand>) -> u32 {
         }
     }
 
-    let mut scores: BTreeMap<u64, u32> = BTreeMap::new();
-    input.iter().for_each(|hand| {
-        let mut score_bytes = [0u8; 8];
-        for card in hand.cards.bytes().map(card_value) {
-            for i in 0..8 {
-                match (score_bytes[i] & 0xf).cmp(&card) {
-                    Ordering::Less => {
-                        score_bytes.copy_within(i..7, i + 1);
-                        score_bytes[i] = card;
-                        break;
+    fn kind_score(hand: &[u8]) -> u64 {
+        let mut hand_strength = 0;
+        let mut joker_count = 0;
+        let mut max_strenth = 0;
+
+        for i in 0..5 {
+            if hand[i] == b'J' {
+                joker_count += 1;
+            } else {
+                let mut card_strength = 0;
+                for j in (i + 1)..5 {
+                    if hand[i] == hand[j] {
+                        card_strength += 1;
                     }
-                    Ordering::Equal => {
-                        score_bytes[i] = score_bytes[i] + 0x10;
-                        break;
-                    }
-                    Ordering::Greater => continue,
                 }
+                hand_strength += card_strength;
+                max_strenth = max_strenth.max(card_strength);
             }
         }
-        score_bytes.sort();
-        let score: u64 = u64::from_le_bytes(score_bytes);
+
+        for _joker in 0..joker_count {
+            max_strenth += 1;
+            hand_strength += max_strenth;
+        }
+
+        let kind = match hand_strength {
+            15 => HandType::FiveKind,
+            10 => HandType::FiveKind,
+            6 => HandType::FourKind,
+            4 => HandType::FullHouse,
+            3 => HandType::ThreeKind,
+            2 => HandType::TwoPair,
+            1 => HandType::OnePair,
+            0 => HandType::HighCard,
+            _ => {
+                unreachable!()
+            }
+        };
+
+        let score_bytes = [
+            0,
+            kind as u8,
+            0,
+            card_value(hand[0]),
+            card_value(hand[1]),
+            card_value(hand[2]),
+            card_value(hand[3]),
+            card_value(hand[4]),
+        ];
+
+        u64::from_be_bytes(score_bytes)
+    }
+
+    let mut scores: BTreeMap<u64, u32> = BTreeMap::new();
+
+    input.iter().for_each(|hand| {
+        let score = kind_score(hand.cards.as_bytes());
         scores.insert(score, hand.bid);
-        // })
     });
 
     let mut rank = 0;
