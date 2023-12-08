@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use advent::*;
+use num::Integer;
 
 advent_day!(Day8, parse, WastelandMap, part1, part2);
 
@@ -72,13 +73,6 @@ pub fn part1(input: &WastelandMap) -> u32 {
         .cycle()
         .scan("AAA", |node, instruction| {
             let next = input.map[node][(*instruction) as usize];
-            println!(
-                " At {node} =[{}]> => {next}",
-                match instruction {
-                    0 => "L",
-                    _ => "R",
-                }
-            );
 
             if next == "ZZZ" {
                 None
@@ -94,17 +88,35 @@ pub fn part1(input: &WastelandMap) -> u32 {
 /// ```rust
 /// use advent_of_code_2023::day8::*;
 /// let input = parse(
-/// r"RL
+/// r"LR
 ///
-/// AAA = (BBB, CCC)
-/// BBB = (DDD, EEE)
-/// CCC = (ZZZ, GGG)
-/// DDD = (DDD, DDD)
-/// EEE = (EEE, EEE)
-/// GGG = (GGG, GGG)
-/// ZZZ = (ZZZ, ZZZ)");
-/// //assert_eq!(?, part2(&input));
+/// 11A = (11B, XXX)
+/// 11B = (XXX, 11Z)
+/// 11Z = (11B, XXX)
+/// 22A = (22B, XXX)
+/// 22B = (22C, 22C)
+/// 22C = (22Z, 22Z)
+/// 22Z = (22B, 22B)
+/// XXX = (XXX, XXX)");
+/// assert_eq!(6, part2(&input));
 /// ```
-pub fn part2(input: &WastelandMap) -> u32 {
-    unimplemented!()
+pub fn part2(input: &WastelandMap) -> u64 {
+    input
+        .map
+        .keys()
+        .filter(|node| node.ends_with('A'))
+        .map(|start_node| {
+            input
+                .instructions
+                .iter()
+                .cycle()
+                .scan(*start_node, |node, instruction| {
+                    let current = *node;
+                    *node = input.map[*node][*instruction as usize];
+                    Some(current)
+                })
+                .take_while(|step| !step.ends_with("Z"))
+                .count() as u64
+        })
+        .fold(1u64, |lcm: u64, cycle| lcm.lcm(&cycle))
 }

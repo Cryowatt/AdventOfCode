@@ -29,8 +29,8 @@ impl UPoint {
 #[macro_export]
 macro_rules! run_day {
     ($id:literal, $day:path) => {
-        print!("Day {}# [{:<10}]", $id, <$day>::part1());
-        println!(" [{:<10}]", <$day>::part2());
+        print!("Day {}# [{:<15}]", $id, <$day>::part1());
+        println!(" [{:<15}]", <$day>::part2());
     };
 }
 
