@@ -1,10 +1,4 @@
-use std::{
-    cmp::Ordering,
-    collections::{BTreeMap, HashMap},
-    mem::transmute,
-    slice,
-    sync::Arc,
-};
+use std::collections::BTreeMap;
 
 use advent::*;
 
@@ -13,13 +7,6 @@ advent_day!(Day7, parse, Vec<CamelHand>, part1, part2);
 pub struct CamelHand<'a> {
     cards: &'a str,
     bid: u32,
-}
-
-impl std::hash::Hash for CamelHand<'_> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.cards.hash(state);
-        self.bid.hash(state);
-    }
 }
 
 pub fn parse(input: &str) -> Vec<CamelHand> {
@@ -33,17 +20,6 @@ pub fn parse(input: &str) -> Vec<CamelHand> {
             }
         })
         .collect()
-}
-
-#[derive(PartialOrd, Ord, PartialEq, Eq)]
-enum HandType {
-    FiveKind = 6,
-    FourKind = 5,
-    FullHouse = 4,
-    ThreeKind = 3,
-    TwoPair = 2,
-    OnePair = 1,
-    HighCard = 0,
 }
 
 /// ```rust
@@ -87,23 +63,9 @@ pub fn part1(input: &Vec<CamelHand>) -> u32 {
             }
         }
 
-        let kind = match hand_strength {
-            10 => HandType::FiveKind,
-            6 => HandType::FourKind,
-            4 => HandType::FullHouse,
-            3 => HandType::ThreeKind,
-            2 => HandType::TwoPair,
-            1 => HandType::OnePair,
-            0 => HandType::HighCard,
-            _ => {
-                println!("FK {}", hand_strength);
-                unreachable!()
-            }
-        };
-
         let score_bytes = [
             0,
-            kind as u8,
+            hand_strength,
             0,
             card_value(hand[0]),
             card_value(hand[1]),
@@ -182,28 +144,15 @@ pub fn part2(input: &Vec<CamelHand>) -> u32 {
             }
         }
 
-        for _joker in 0..joker_count {
+        // Limit wildcard math to four card, the fifth joker is the card the other jokers match to.
+        for _joker in 0..(joker_count.min(4)) {
             max_strenth += 1;
             hand_strength += max_strenth;
         }
 
-        let kind = match hand_strength {
-            15 => HandType::FiveKind,
-            10 => HandType::FiveKind,
-            6 => HandType::FourKind,
-            4 => HandType::FullHouse,
-            3 => HandType::ThreeKind,
-            2 => HandType::TwoPair,
-            1 => HandType::OnePair,
-            0 => HandType::HighCard,
-            _ => {
-                unreachable!()
-            }
-        };
-
         let score_bytes = [
             0,
-            kind as u8,
+            hand_strength,
             0,
             card_value(hand[0]),
             card_value(hand[1]),
