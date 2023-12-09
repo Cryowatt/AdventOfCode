@@ -6,7 +6,7 @@ use std::{
 use advent::*;
 
 advent_day!(Day4, parse, Vec<Card>, part1, part2);
-advent_bench!(raw, cursed_regex::part1_cursed);
+advent_bench!(raw, cursed_regex, part1_cursed);
 
 pub fn parse(input: &str) -> Vec<Card> {
     input
