@@ -72,7 +72,7 @@ macro_rules! advent_day {
 
 #[macro_export]
 macro_rules! advent_bench {
-    ($parser:ident, $module:ident::$part1_func:ident) => {
+    ($parser:ident, $module:ident, $part1_func:ident) => {
         #[cfg(test)]
         mod $module {
             extern crate test;
@@ -80,6 +80,26 @@ macro_rules! advent_bench {
             #[cfg(feature = "cursed")]
             #[bench]
             fn bench(b: &mut test::Bencher) {
+                let input = super::$parser(include_str!("input.txt"));
+                b.iter(|| test::black_box(super::$part1_func(&input)));
+            }
+        }
+    };
+    ($parser:ident, $module:ident, $part1_func:ident, $part2_func:ident) => {
+        #[cfg(test)]
+        mod $module {
+            extern crate test;
+
+            #[cfg(feature = "cursed")]
+            #[bench]
+            fn part1_bench(b: &mut test::Bencher) {
+                let input = super::$parser(include_str!("input.txt"));
+                b.iter(|| test::black_box(super::$part1_func(&input)));
+            }
+
+            #[cfg(feature = "cursed")]
+            #[bench]
+            fn part2_bench(b: &mut test::Bencher) {
                 let input = super::$parser(include_str!("input.txt"));
                 b.iter(|| test::black_box(super::$part1_func(&input)));
             }
