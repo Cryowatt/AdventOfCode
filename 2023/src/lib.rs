@@ -1,7 +1,9 @@
 #![feature(ascii_char)]
+#![feature(coroutines)]
 #![feature(extend_one)]
 #![feature(int_roundings)]
 #![feature(isqrt)]
+#![feature(iter_map_windows)]
 #![feature(test)]
 
 pub mod day1;
@@ -12,3 +14,4 @@ pub mod day5;
 pub mod day6;
 pub mod day7;
 pub mod day8;
+pub mod day9;
