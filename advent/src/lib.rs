@@ -1,4 +1,4 @@
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct UPoint {
     pub x: u32,
     pub y: u32,
@@ -23,6 +23,10 @@ impl UPoint {
 
     pub fn down(&self) -> Option<Self> {
         self.y.checked_add(1).map(|y| Self::new(self.x, y))
+    }
+
+    pub fn manhattan(&self, other: &UPoint) -> u32 {
+        self.x.abs_diff(other.x) + self.y.abs_diff(other.y)
     }
 }
 
