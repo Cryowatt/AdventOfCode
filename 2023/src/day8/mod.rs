@@ -55,9 +55,6 @@ pub fn parse(input: &str) -> WastelandMap {
     }
 }
 
-// test day8::bench::part1_bench ... bench:     623,660 ns/iter (+/- 17,714)
-// test day8::bench::part2_bench ... bench:   1,619,820 ns/iter (+/- 40,547)
-
 pub struct WastelandMap<'a> {
     instructions: Vec<u8>,
     map: HashMap<&'a str, [&'a str; 2]>,
