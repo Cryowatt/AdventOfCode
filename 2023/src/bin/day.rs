@@ -13,31 +13,31 @@ fn main() {
         .expect("Day ID must be a number");
     match day_id {
         1 => {
-            run_day!(1, day1::Day1);
+            run_day!(1, day01::Day01);
         }
         2 => {
-            run_day!(2, day2::Day2);
+            run_day!(2, day02::Day02);
         }
         3 => {
-            run_day!(3, day3::Day3);
+            run_day!(3, day03::Day03);
         }
         4 => {
-            run_day!(4, day4::Day4);
+            run_day!(4, day04::Day04);
         }
         5 => {
-            run_day!(5, day5::Day5);
+            run_day!(5, day05::Day05);
         }
         6 => {
-            run_day!(6, day6::Day6);
+            run_day!(6, day06::Day06);
         }
         7 => {
-            run_day!(7, day7::Day7);
+            run_day!(7, day07::Day07);
         }
         8 => {
-            run_day!(8, day8::Day8);
+            run_day!(8, day08::Day08);
         }
         9 => {
-            run_day!(9, day9::Day9);
+            run_day!(9, day09::Day09);
         }
         19 => {
             run_day!(10, day10::Day10);

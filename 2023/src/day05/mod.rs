@@ -2,7 +2,7 @@ use std::{cmp::Ordering, ops::RangeInclusive};
 
 use advent::*;
 
-advent_day!(Day5, parse, SeedMaps, part1, part2);
+advent_day!(Day05, parse, SeedMaps, part1, part2);
 
 pub fn parse(input: &str) -> SeedMaps {
     fn map_regex(map_name: &str) -> String {
@@ -99,7 +99,7 @@ pub struct SeedMaps {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day5::*;
+/// use advent_of_code_2023::day05::*;
 /// let input = parse(
 /// r"seeds: 79 14 55 13
 ///
@@ -167,7 +167,7 @@ pub fn part1(input: &SeedMaps) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day5::*;
+/// use advent_of_code_2023::day05::*;
 /// let input = parse(
 /// r"seeds: 79 14 55 13
 ///

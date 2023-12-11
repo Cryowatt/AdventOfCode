@@ -1,6 +1,6 @@
 use advent::*;
 
-advent_day!(Day6, parse, Vec<BoatRace>, part1, part2);
+advent_day!(Day06, parse, Vec<BoatRace>, part1, part2);
 
 pub struct BoatRace {
     time: u32,
@@ -29,7 +29,7 @@ pub fn parse(input: &str) -> Vec<BoatRace> {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day6::*;
+/// use advent_of_code_2023::day06::*;
 /// let input = parse(
 /// r"Time:      7  15   30
 /// Distance:  9  40  200");
@@ -48,7 +48,7 @@ pub fn part1(input: &Vec<BoatRace>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day6::*;
+/// use advent_of_code_2023::day06::*;
 /// let input = parse(
 /// r"Time:      7  15   30
 /// Distance:  9  40  200");

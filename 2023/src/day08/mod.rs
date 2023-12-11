@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use advent::*;
 use num::Integer;
 
-advent_day!(Day8, parse, WastelandMap, part1, part2);
+advent_day!(Day08, parse, WastelandMap, part1, part2);
 advent_bench!(parse, cursed_hashmap, part1_hashmap, part2_hashmap);
 
 pub fn parse(input: &str) -> WastelandMap {
@@ -62,7 +62,7 @@ pub struct WastelandMap<'a> {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day8::*;
+/// use advent_of_code_2023::day08::*;
 /// let input = parse(
 /// r"RL
 ///
@@ -76,7 +76,7 @@ pub struct WastelandMap<'a> {
 /// assert_eq!(2, part1(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day8::*;
+/// use advent_of_code_2023::day08::*;
 /// let input = parse(
 /// r"LLR
 ///
@@ -105,7 +105,7 @@ pub fn part1(input: &WastelandMap) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day8::*;
+/// use advent_of_code_2023::day08::*;
 /// let input = parse(
 /// r"RL
 ///
@@ -119,7 +119,7 @@ pub fn part1(input: &WastelandMap) -> u32 {
 /// assert_eq!(2, part1(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day8::*;
+/// use advent_of_code_2023::day08::*;
 /// let input = parse(
 /// r"LLR
 ///
@@ -148,7 +148,7 @@ pub fn part1_hashmap(input: &WastelandMap) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day8::*;
+/// use advent_of_code_2023::day08::*;
 /// let input = parse(
 /// r"LR
 ///
@@ -183,7 +183,7 @@ pub fn part2(input: &WastelandMap) -> u64 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day8::*;
+/// use advent_of_code_2023::day08::*;
 /// let input = parse(
 /// r"LR
 ///
