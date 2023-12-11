@@ -30,8 +30,6 @@ pub struct GalaxyMap {
     galaxy: Vec<UPoint>,
 }
 
-impl GalaxyMap {}
-
 /// ```rust
 /// use advent_of_code_2023::day11::*;
 /// let input = parse(
@@ -47,7 +45,41 @@ impl GalaxyMap {}
 /// #...#.....");
 /// assert_eq!(374, part1(&input));
 /// ```
-pub fn part1(map: &GalaxyMap) -> u32 {
+pub fn part1(map: &GalaxyMap) -> u64 {
+    expand_universe(map, 2)
+}
+
+/// ```rust
+/// use advent_of_code_2023::day11::*;
+/// let input = parse(
+/// r"...#......
+/// .......#..
+/// #.........
+/// ..........
+/// ......#...
+/// .#........
+/// .........#
+/// ..........
+/// .......#..
+/// #...#.....");
+/// assert_eq!(1030, expand_universe(&input, 10));
+/// ```
+/// ```rust
+/// use advent_of_code_2023::day11::*;
+/// let input = parse(
+/// r"...#......
+/// .......#..
+/// #.........
+/// ..........
+/// ......#...
+/// .#........
+/// .........#
+/// ..........
+/// .......#..
+/// #...#.....");
+/// assert_eq!(8410, expand_universe(&input, 100));
+/// ```
+pub fn expand_universe(map: &GalaxyMap, expansion_rate: u32) -> u64 {
     let galaxies: Vec<_> = map
         .galaxy
         .iter()
@@ -80,6 +112,7 @@ pub fn part1(map: &GalaxyMap) -> u32 {
     fn expand_universe<F: Fn(RefMut<'_, UPoint>, u32)>(
         map: &Vec<Vec<Rc<RefCell<UPoint>>>>,
         axis: F,
+        expansion_rate: u32,
     ) {
         map.iter().fold(0, |expansion, stripe| {
             stripe.iter().for_each(|galaxy| {
@@ -87,7 +120,7 @@ pub fn part1(map: &GalaxyMap) -> u32 {
             });
 
             if stripe.is_empty() {
-                expansion + 1
+                expansion + (expansion_rate - 1)
             } else {
                 expansion
             }
@@ -95,9 +128,17 @@ pub fn part1(map: &GalaxyMap) -> u32 {
     }
 
     // expand the universe horizontally
-    expand_universe(&col_map, |mut galaxy, expansion| galaxy.x += expansion);
+    expand_universe(
+        &col_map,
+        |mut galaxy, expansion| galaxy.x += expansion,
+        expansion_rate,
+    );
     // expand the universe horizontally
-    expand_universe(&row_map, |mut galaxy, expansion| galaxy.y += expansion);
+    expand_universe(
+        &row_map,
+        |mut galaxy, expansion| galaxy.y += expansion,
+        expansion_rate,
+    );
 
     galaxies
         .iter()
@@ -106,29 +147,13 @@ pub fn part1(map: &GalaxyMap) -> u32 {
             let galaxy = galaxy.borrow();
             galaxies
                 .iter()
-                .enumerate()
                 .skip(i + 1)
-                .map(|(j, to_galaxy)| galaxy.manhattan(to_galaxy.borrow().deref()))
-                .sum::<u32>()
+                .map(|to_galaxy| galaxy.manhattan(to_galaxy.borrow().deref()) as u64)
+                .sum::<u64>()
         })
         .sum()
 }
 
-/// ```rust
-/// use advent_of_code_2023::day11::*;
-/// let input = parse(
-/// r"...#......
-/// .......#..
-/// #.........
-/// ..........
-/// ......#...
-/// .#........
-/// .........#
-/// ..........
-/// .......#..
-/// #...#.....");
-/// //assert_eq!(4, part2(&input));
-/// ```
-pub fn part2(map: &GalaxyMap) -> u32 {
-    0
+pub fn part2(map: &GalaxyMap) -> u64 {
+    expand_universe(map, 1_000_000)
 }

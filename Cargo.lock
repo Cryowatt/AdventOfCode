@@ -9,6 +9,7 @@ dependencies = [
  "ctor",
  "env_logger",
  "log",
+ "num-traits",
  "onig",
  "regex",
 ]

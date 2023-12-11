@@ -1,31 +1,46 @@
+pub type UPoint = Point<u32>;
+pub type IPoint = Point<i32>;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub struct UPoint {
-    pub x: u32,
-    pub y: u32,
+pub struct Point<T> {
+    pub x: T,
+    pub y: T,
 }
 
-impl UPoint {
-    pub fn new(x: u32, y: u32) -> Self {
+impl<T> Point<T>
+where
+    T: num_traits::CheckedSub + num_traits::CheckedAdd + num_traits::identities::One + Copy,
+{
+    pub fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
 
     pub fn left(&self) -> Option<Self> {
-        self.x.checked_sub(1).map(|x| Self::new(x, self.y))
+        self.x.checked_sub(&T::one()).map(|x| Self::new(x, self.y))
     }
 
     pub fn right(&self) -> Option<Self> {
-        self.x.checked_add(1).map(|x| Self::new(x, self.y))
+        self.x.checked_add(&T::one()).map(|x| Self::new(x, self.y))
     }
 
     pub fn up(&self) -> Option<Self> {
-        self.y.checked_sub(1).map(|y| Self::new(self.x, y))
+        self.y.checked_sub(&T::one()).map(|y| Self::new(self.x, y))
     }
 
     pub fn down(&self) -> Option<Self> {
-        self.y.checked_add(1).map(|y| Self::new(self.x, y))
+        self.y.checked_add(&T::one()).map(|y| Self::new(self.x, y))
     }
+}
 
-    pub fn manhattan(&self, other: &UPoint) -> u32 {
+pub trait Manhattan {
+    type Output;
+    fn manhattan(&self, other: &Self) -> Self::Output;
+}
+
+impl Manhattan for UPoint {
+    type Output = u32;
+
+    fn manhattan(&self, other: &Self) -> Self::Output {
         self.x.abs_diff(other.x) + self.y.abs_diff(other.y)
     }
 }
