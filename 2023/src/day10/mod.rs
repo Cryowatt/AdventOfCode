@@ -34,10 +34,12 @@ bitflags! {
         const South = 0b00000010;
         const West =  0b00000100;
         const East =  0b00001000;
-        const Start = 0b00010000;
+        const Start = 0b10010000;
+        const Visited = 0b10000000;
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PipeMap {
     rows: Vec<Vec<PipeEnds>>,
 }
@@ -45,6 +47,12 @@ pub struct PipeMap {
 impl PipeMap {
     fn cell(&self, position: UPoint) -> PipeEnds {
         self.rows[position.y as usize][position.x as usize]
+    }
+
+    fn mark_cell(&mut self, position: UPoint) -> PipeEnds {
+        let pipe_ends = self.rows[position.y as usize][position.x as usize];
+        self.rows[position.y as usize][position.x as usize] = pipe_ends | PipeEnds::Visited;
+        pipe_ends
     }
 }
 
@@ -112,7 +120,6 @@ pub fn part1(map: &PipeMap) -> u32 {
         unreachable!();
     };
 
-    // let mut distance = position.1.manhattan(&start);
     let mut distance = 1;
 
     // Walk the route
@@ -176,5 +183,95 @@ pub fn part1(map: &PipeMap) -> u32 {
 /// assert_eq!(10, part2(&input));
 /// ```
 pub fn part2(map: &PipeMap) -> u32 {
-    unimplemented!();
+    let mut map = (*map).clone();
+
+    // Find start
+    let start = map
+        .rows
+        .iter()
+        .enumerate()
+        .filter_map(|row| {
+            match row
+                .1
+                .iter()
+                .enumerate()
+                .filter_map(|cell| {
+                    if *cell.1 == PipeEnds::Start {
+                        Some(cell.0)
+                    } else {
+                        None
+                    }
+                })
+                .next()
+            {
+                Some(x) => Some(UPoint::new(x as u32, row.0 as u32)),
+                None => None,
+            }
+        })
+        .next()
+        .unwrap();
+
+    let check_direction = |point: Option<UPoint>, from_direction: PipeEnds| -> bool {
+        point.map_or(false, |up| map.cell(up).contains(from_direction))
+    };
+
+    // Check around the start position for the first step
+    let mut position = if check_direction(start.up(), PipeEnds::South) {
+        map.rows[start.y as usize][start.x as usize] |= PipeEnds::South;
+        (PipeEnds::South, start.up().unwrap())
+    } else if check_direction(start.left(), PipeEnds::East) {
+        map.rows[start.y as usize][start.x as usize] |= PipeEnds::East;
+        (PipeEnds::East, start.left().unwrap())
+    } else if check_direction(start.right(), PipeEnds::West) {
+        map.rows[start.y as usize][start.x as usize] |= PipeEnds::West;
+        (PipeEnds::West, start.right().unwrap())
+    } else if check_direction(start.down(), PipeEnds::North) {
+        map.rows[start.y as usize][start.x as usize] |= PipeEnds::North;
+        (PipeEnds::North, start.down().unwrap())
+    } else {
+        unreachable!();
+    };
+
+    // Walk the route
+    while position.1 != start {
+        let cell = map.mark_cell(position.1);
+        position = match cell.difference(position.0) {
+            PipeEnds::North => (PipeEnds::South, position.1.up().unwrap()),
+            PipeEnds::South => (PipeEnds::North, position.1.down().unwrap()),
+            PipeEnds::East => (PipeEnds::West, position.1.right().unwrap()),
+            PipeEnds::West => (PipeEnds::East, position.1.left().unwrap()),
+            _ => unreachable!(),
+        };
+    }
+
+    map.rows[position.1.y as usize][position.1.x as usize] |= position.0;
+
+    let mut inside = 0;
+
+    for row in map.rows {
+        let mut loop_orientation = PipeEnds::empty();
+        let mut is_inside = false;
+        for cell in row {
+            if cell.contains(PipeEnds::Visited) {
+                const NORTH_SOUTH: PipeEnds = PipeEnds::North.union(PipeEnds::South);
+                let path_orientation = cell.intersection(NORTH_SOUTH);
+
+                if !is_inside {
+                    loop_orientation = path_orientation;
+                    is_inside = true;
+                } else {
+                    loop_orientation ^= path_orientation;
+                    if loop_orientation.is_empty() {
+                        is_inside = false;
+                    }
+                }
+            } else {
+                if is_inside {
+                    inside += 1;
+                }
+            }
+        }
+    }
+
+    inside
 }
