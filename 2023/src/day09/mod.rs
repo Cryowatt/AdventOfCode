@@ -1,6 +1,6 @@
 use advent::*;
 
-advent_day!(Day9, parse, Vec<Vec<i32>>, part1, part2);
+advent_day!(Day09, parse, Vec<Vec<i32>>, part1, part2);
 
 pub fn parse(input: &str) -> Vec<Vec<i32>> {
     input
@@ -14,25 +14,25 @@ pub fn parse(input: &str) -> Vec<Vec<i32>> {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"0 3 6 9 12 15");
 /// assert_eq!(18, part1(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"1 3 6 10 15 21");
 /// assert_eq!(28, part1(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"10 13 16 21 30 45");
 /// assert_eq!(68, part1(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"0 3 6 9 12 15
 /// 1 3 6 10 15 21
@@ -74,25 +74,25 @@ pub fn part1(input: &Vec<Vec<i32>>) -> i32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"0 3 6 9 12 15");
 /// assert_eq!(-3, part2(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"1 3 6 10 15 21");
 /// assert_eq!(0, part2(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"10 13 16 21 30 45");
 /// assert_eq!(5, part2(&input));
 /// ```
 /// ```rust
-/// use advent_of_code_2023::day9::*;
+/// use advent_of_code_2023::day09::*;
 /// let input = parse(
 /// r"0 3 6 9 12 15
 /// 1 3 6 10 15 21

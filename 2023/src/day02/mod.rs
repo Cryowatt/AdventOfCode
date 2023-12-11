@@ -2,14 +2,14 @@ use std::sync::OnceLock;
 
 use advent::*;
 
-advent_day!(Day2, parse, Vec<&str>, part1, part2);
+advent_day!(Day02, parse, Vec<&str>, part1, part2);
 
 pub fn parse(input: &str) -> Vec<&str> {
     input.lines().collect()
 }
 
 /// ```rust
-/// use advent_of_code_2023::day2::*;
+/// use advent_of_code_2023::day02::*;
 /// let input = parse(
 /// r"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 /// Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
@@ -50,7 +50,7 @@ pub fn part1(input: &Vec<&str>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day2::*;
+/// use advent_of_code_2023::day02::*;
 /// let input = parse(
 /// r"Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 /// Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue

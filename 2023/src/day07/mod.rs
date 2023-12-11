@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use advent::*;
 
-advent_day!(Day7, parse, Vec<CamelHand>, part1, part2);
+advent_day!(Day07, parse, Vec<CamelHand>, part1, part2);
 
 pub struct CamelHand<'a> {
     cards: &'a str,
@@ -23,7 +23,7 @@ pub fn parse(input: &str) -> Vec<CamelHand> {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day7::*;
+/// use advent_of_code_2023::day07::*;
 /// let input = parse(
 /// r"32T3K 765
 /// T55J5 684
@@ -95,7 +95,7 @@ pub fn part1(input: &Vec<CamelHand>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day7::*;
+/// use advent_of_code_2023::day07::*;
 /// let input = parse(
 /// r"32T3K 765
 /// T55J5 684

@@ -1,6 +1,6 @@
 use advent::*;
 
-advent_day!(Day3, parse, Grid<'_>, part1, part2);
+advent_day!(Day03, parse, Grid<'_>, part1, part2);
 
 pub fn parse<'a>(input: &'a str) -> Grid<'a> {
     let width = input.find(['\r', '\n']).unwrap();
@@ -99,7 +99,7 @@ fn part_number(grid: &Grid, position: UPoint) -> Option<u32> {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day3::*;
+/// use advent_of_code_2023::day03::*;
 /// let input = parse(
 /// r"467..114..
 /// ...*......
@@ -148,7 +148,7 @@ pub fn part1(grid: &Grid<'_>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2023::day3::*;
+/// use advent_of_code_2023::day03::*;
 /// let input = parse(
 /// r"467..114..
 /// ...*......

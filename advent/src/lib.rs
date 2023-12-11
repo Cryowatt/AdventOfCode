@@ -1,4 +1,4 @@
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct UPoint {
     pub x: u32,
     pub y: u32,
