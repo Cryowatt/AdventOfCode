@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use advent::*;
 
 advent_day!(Day12, parse, Vec<SpringRecord>, part1, part2);
@@ -69,14 +67,13 @@ fn matches_count<'a>(
     row: &'a [u8],
     pattern: &'a [usize],
     min_pattern_length: usize,
-    memo: &mut Option<&mut HashMap<Memo<'a>, u64>>,
+    memo: &mut Vec<Vec<Option<u64>>>,
 ) -> u64 {
     // Memoization
-    if let Some(matches) = memo
-        .as_ref()
-        .map_or(None, move |memo| memo.get(&Memo { row, pattern }))
-    {
-        return *matches;
+    let row_index = row.len() - 1;
+    let pattern_index = pattern.len() - 1;
+    if let Some(matches) = memo[pattern_index][row_index] {
+        return matches;
     }
 
     let mut matches = 0;
@@ -117,8 +114,7 @@ fn matches_count<'a>(
             break;
         }
     }
-    memo.as_mut()
-        .map(|m| m.insert(Memo { row, pattern }, matches));
+    memo[pattern_index][row_index] = Some(matches);
     matches
 }
 
@@ -176,11 +172,12 @@ pub fn part1(input: &Vec<SpringRecord>) -> u64 {
             let min_pattern_length =
                 record.pattern.iter().sum::<usize>() + record.pattern.len() - 1;
 
+            let mut memo = vec![vec![None; record.row.len()]; record.pattern.len()];
             matches_count(
                 record.row,
                 record.pattern.as_slice(),
                 min_pattern_length,
-                &mut None,
+                &mut memo,
             )
         })
         .sum()
@@ -242,12 +239,12 @@ pub fn part2(input: &Vec<SpringRecord>) -> u64 {
             let min_pattern_length =
                 unfolded_pattern.iter().sum::<usize>() + unfolded_pattern.len() - 1;
 
-            let mut memo = HashMap::<Memo, u64>::new();
+            let mut memo = vec![vec![None; unfolded_row.len()]; unfolded_pattern.len()];
             matches_count(
                 unfolded_row.as_slice(),
                 unfolded_pattern.as_slice(),
                 min_pattern_length,
-                &mut Some(&mut memo),
+                &mut memo,
             )
         })
         .sum()
