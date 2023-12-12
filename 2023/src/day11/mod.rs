@@ -80,6 +80,7 @@ pub fn part1(map: &GalaxyMap) -> u64 {
 /// assert_eq!(8410, expand_universe(&input, 100));
 /// ```
 pub fn expand_universe(map: &GalaxyMap, expansion_rate: u32) -> u64 {
+    let expansion_rate = expansion_rate - 1;
     let galaxies: Vec<_> = map
         .galaxy
         .iter()
@@ -120,7 +121,7 @@ pub fn expand_universe(map: &GalaxyMap, expansion_rate: u32) -> u64 {
             });
 
             if stripe.is_empty() {
-                expansion + (expansion_rate - 1)
+                expansion + expansion_rate
             } else {
                 expansion
             }
