@@ -1,6 +1,6 @@
 use advent::*;
 
-advent_day!(Day2, parse, Vec<(u32, u32, u32)>, part1, part2);
+advent_day!(Day02, parse, Vec<(u32, u32, u32)>, part1, part2);
 
 pub fn parse(input: &str) -> Vec<(u32, u32, u32)> {
     input
@@ -17,11 +17,11 @@ pub fn parse(input: &str) -> Vec<(u32, u32, u32)> {
 }
 
 /// ```rust
-/// use advent_of_code_2015::day2::*;
+/// use advent_of_code_2015::day02::*;
 /// assert_eq!(58, part1(&(parse("2x3x4"))));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day2::*;
+/// use advent_of_code_2015::day02::*;
 /// assert_eq!(43, part1(&parse("1x1x10")));
 /// ```
 pub fn part1(input: &Vec<(u32, u32, u32)>) -> u32 {
@@ -37,11 +37,11 @@ pub fn part1(input: &Vec<(u32, u32, u32)>) -> u32 {
 }
 
 /// ```rust
-/// use advent_of_code_2015::day2::*;
+/// use advent_of_code_2015::day02::*;
 /// assert_eq!(34, part2(&(parse("2x3x4"))));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day2::*;
+/// use advent_of_code_2015::day02::*;
 /// assert_eq!(14, part2(&parse("1x1x10")));
 /// ```
 pub fn part2(input: &Vec<(u32, u32, u32)>) -> u32 {
