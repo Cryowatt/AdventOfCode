@@ -1,49 +1,49 @@
 use advent::*;
 
-advent_day!(Day1, parse, &str, part1, part2);
+advent_day!(Day01, parse, &str, part1, part2);
 
 pub fn parse(input: &str) -> &str {
     input
 }
 
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(0, part1(&(parse("(())"))));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(0, part1(&parse("()()")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(3, part1(&parse("(((")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(3, part1(&parse("(()(()(")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(3, part1(&parse("))(((((")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(-1, part1(&parse("())")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(-1, part1(&parse("))(")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(-3, part1(&parse(")))")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(-3, part1(&parse(")())())")));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// ```
 pub fn part1(input: &str) -> i32 {
     input.bytes().fold(0, |floor, c| match c {
@@ -54,11 +54,11 @@ pub fn part1(input: &str) -> i32 {
 }
 
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(1, part2(&(parse(")"))));
 /// ```
 /// ```rust
-/// use advent_of_code_2015::day1::*;
+/// use advent_of_code_2015::day01::*;
 /// assert_eq!(5, part2(&parse("()())")));
 /// ```
 pub fn part2(input: &str) -> u32 {

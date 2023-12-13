@@ -9,10 +9,37 @@ pub struct Point<T> {
 
 impl<T> Point<T>
 where
-    T: num_traits::CheckedSub + num_traits::CheckedAdd + num_traits::identities::One + Copy,
+    T: num_traits::CheckedSub
+        + num_traits::CheckedAdd
+        + num_traits::identities::One
+        + num_traits::identities::Zero
+        + Copy,
 {
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
+    }
+
+    pub fn origin() -> Self {
+        Self {
+            x: T::zero(),
+            y: T::zero(),
+        }
+    }
+
+    pub fn north(&self) -> Option<Self> {
+        self.up()
+    }
+
+    pub fn south(&self) -> Option<Self> {
+        self.down()
+    }
+
+    pub fn east(&self) -> Option<Self> {
+        self.right()
+    }
+
+    pub fn west(&self) -> Option<Self> {
+        self.left()
     }
 
     pub fn left(&self) -> Option<Self> {
@@ -30,6 +57,13 @@ where
     pub fn down(&self) -> Option<Self> {
         self.y.checked_add(&T::one()).map(|y| Self::new(self.x, y))
     }
+}
+
+pub enum Direction {
+    North,
+    South,
+    East,
+    West,
 }
 
 pub trait Manhattan {
