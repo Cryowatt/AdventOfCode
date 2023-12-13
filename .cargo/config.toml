@@ -1,13 +1,21 @@
 [alias] # command aliases
 all = "run"
 day = "run --bin day"
-ci = [
+ci-2015 = [
     "watch",
     "--clear",
     "-x",
     "test --doc",
     "-x",
     "run --bin advent_of_code_2015",
+    "-x",
+    "bench",
+]
+ci-2023 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc",
     "-x",
     "run --bin advent_of_code_2023",
     "-x",
