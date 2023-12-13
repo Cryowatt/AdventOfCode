@@ -1,4 +1,5 @@
 use advent::*;
+use rayon::prelude::*;
 
 advent_day!(Day12, parse, Vec<SpringRecord>, part1, part2);
 
@@ -8,6 +9,22 @@ pub fn parse(input: &str) -> Vec<SpringRecord> {
         .map(|line| {
             let (row, pattern) = line.split_once(" ").unwrap();
             SpringRecord {
+                blocks: row
+                    .split_terminator('.')
+                    .filter_map(|block| {
+                        if block.len() == 0 {
+                            None
+                        } else {
+                            Some(block.as_bytes().iter().fold(0, |acc, b| {
+                                if *b == b'?' {
+                                    (acc << 1) + 1
+                                } else {
+                                    (acc << 1) + 0
+                                }
+                            }))
+                        }
+                    })
+                    .collect(),
                 row: row.as_bytes(),
                 pattern: pattern
                     .split(",")
@@ -20,6 +37,7 @@ pub fn parse(input: &str) -> Vec<SpringRecord> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SpringRecord<'a> {
+    blocks: Vec<u32>,
     row: &'a [u8],
     pattern: Vec<usize>,
 }
@@ -167,7 +185,7 @@ fn matches_count<'a>(
 /// ```
 pub fn part1(input: &Vec<SpringRecord>) -> u64 {
     input
-        .iter()
+        .par_iter()
         .map(|record| {
             let min_pattern_length =
                 record.pattern.iter().sum::<usize>() + record.pattern.len() - 1;
@@ -232,7 +250,7 @@ pub fn part1(input: &Vec<SpringRecord>) -> u64 {
 /// ```
 pub fn part2(input: &Vec<SpringRecord>) -> u64 {
     input
-        .iter()
+        .par_iter()
         .map(|record| {
             let unfolded_row = [record.row; 5].join(&b'?');
             let unfolded_pattern = record.pattern.repeat(5);
