@@ -1,4 +1,4 @@
-use std::{char, collections::HashSet};
+use std::collections::HashSet;
 
 use advent::*;
 
