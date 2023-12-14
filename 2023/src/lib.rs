@@ -1,4 +1,5 @@
 #![feature(ascii_char)]
+#![feature(bound_map)]
 #![feature(coroutines)]
 #![feature(extend_one)]
 #![feature(int_roundings)]
@@ -19,3 +20,4 @@ pub mod day10;
 pub mod day11;
 pub mod day12;
 pub mod day13;
+pub mod day14;
