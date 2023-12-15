@@ -316,7 +316,6 @@ pub fn part2(input: &DishMap) -> u32 {
         match loop_detect.insert(state, (i, load)) {
             Some((index, _)) => {
                 let loop_index = ((1000000000 - index) % (i - index)) + index;
-                println!("Loop length {}", loop_detect.len());
                 return loop_detect
                     .values()
                     .find_map(|(index, load)| {
