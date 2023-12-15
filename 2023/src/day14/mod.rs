@@ -1,4 +1,9 @@
-use std::{cmp::Ordering, collections::HashMap, ops::Range};
+use std::{
+    cmp::Ordering,
+    collections::{hash_map::DefaultHasher, HashMap},
+    hash::Hasher,
+    ops::Range,
+};
 
 use advent::*;
 
@@ -224,17 +229,16 @@ pub fn part2(input: &DishMap) -> u32 {
     }
 
     let get_state = |horizontal_segments: &Vec<Vec<Segment>>| {
-        let mut state = String::new();
+        let mut hasher = DefaultHasher::new();
         let mut load = 0;
 
         for (y, row) in horizontal_segments.iter().enumerate() {
             for segment in row {
                 load += segment.rocks * (input.height - y) as u32;
-                state.push_str(segment.rocks.to_string().as_str());
-                state.push('|');
+                hasher.write_u32(segment.rocks);
             }
         }
-        (state, load)
+        (hasher.finish(), load)
     };
 
     fn rotate<FLookup: Fn(usize, usize) -> usize>(
@@ -279,7 +283,7 @@ pub fn part2(input: &DishMap) -> u32 {
         true,
     );
 
-    let mut loop_detect = HashMap::<String, (u32, u32)>::new();
+    let mut loop_detect = HashMap::<u64, (u32, u32)>::new();
     let (state, load) = get_state(&horizontal_segments);
     loop_detect.insert(state, (1, load));
 
@@ -312,6 +316,7 @@ pub fn part2(input: &DishMap) -> u32 {
         match loop_detect.insert(state, (i, load)) {
             Some((index, _)) => {
                 let loop_index = ((1000000000 - index) % (i - index)) + index;
+                println!("Loop length {}", loop_detect.len());
                 return loop_detect
                     .values()
                     .find_map(|(index, load)| {
