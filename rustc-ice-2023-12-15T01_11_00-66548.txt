@@ -1,0 +1,63 @@
+thread 'rustc' panicked at compiler\rustc_hir_typeck\src\fn_ctxt\suggestions.rs:1755:62:
+already mutably borrowed: BorrowError
+stack backtrace:
+   0:     0x7ffd2eb4e8e4 - std::backtrace::Backtrace::force_capture::h290e295946a2153e
+   1:     0x7ffd2eb4e824 - std::backtrace::Backtrace::force_capture::h290e295946a2153e
+   2:     0x7ffd1e5acd84 - <tracing_subscriber[b1f324f451abffa6]::fmt::format::Writer>::write_fmt
+   3:     0x7ffd2eb67e13 - std::panicking::rust_panic_with_hook::h38ae4b4e41601221
+   4:     0x7ffd2eb67cb5 - <std::panicking::begin_panic_handler::StaticStrPayload as core::panic::PanicPayload>::take_box::hbd9a00db4a2ea23a
+   5:     0x7ffd2eb64e59 - <std::sys_common::backtrace::_print::DisplayBacktrace as core::fmt::Display>::fmt::h574704069d95b2bf
+   6:     0x7ffd2eb679c4 - rust_begin_unwind
+   7:     0x7ffd2ebcc5e7 - core::panicking::panic_fmt::hb27bf337912459fe
+   8:     0x7ffd2ebcc538 - core::cell::panic_already_mutably_borrowed::h7d9b98dd2fe54741
+   9:     0x7ffd1e7cffe9 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::suggest_missing_semicolon
+  10:     0x7ffd1e7aa558 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::emit_type_mismatch_suggestions
+  11:     0x7ffd1e7abc30 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::emit_coerce_suggestions
+  12:     0x7ffd1d71b6e8 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  13:     0x7ffd1d7006b5 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  14:     0x7ffd1d735d1e - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::check_struct_path
+  15:     0x7ffd1d6ff932 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  16:     0x7ffd1d74fff3 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::check_match
+  17:     0x7ffd1d700650 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  18:     0x7ffd1d735f5f - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::check_struct_path
+  19:     0x7ffd1d6ff932 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  20:     0x7ffd1d74fff3 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::check_match
+  21:     0x7ffd1d700650 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  22:     0x7ffd1d735e5a - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::check_struct_path
+  23:     0x7ffd1d702a9d - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  24:     0x7ffd1d74fff3 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::check_match
+  25:     0x7ffd1d700650 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  26:     0x7ffd1d700cfc - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  27:     0x7ffd1d735e5a - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::check_struct_path
+  28:     0x7ffd1d6ff932 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  29:     0x7ffd1d71ac48 - <rustc_hir_typeck[72c0b58dc047d09f]::fn_ctxt::FnCtxt>::demand_coerce
+  30:     0x7ffd1d6e2137 - rustc_hir_typeck[72c0b58dc047d09f]::typeck
+  31:     0x7ffd1d6dcffb - rustc_hir_typeck[72c0b58dc047d09f]::typeck
+  32:     0x7ffd1debbe2f - <rustc_query_impl[d6e88205cda22d72]::plumbing::QueryCtxt as rustc_query_system[f729307075c69a4c]::query::QueryContext>::load_side_effects
+  33:     0x7ffd1df2909f - <rustc_query_impl[d6e88205cda22d72]::plumbing::QueryCtxt as rustc_query_system[f729307075c69a4c]::query::QueryContext>::load_side_effects
+  34:     0x7ffd1df9e607 - <rustc_query_impl[d6e88205cda22d72]::plumbing::QueryCtxt as rustc_query_system[f729307075c69a4c]::query::QueryContext>::load_side_effects
+  35:     0x7ffd1df315f4 - <rustc_query_impl[d6e88205cda22d72]::plumbing::QueryCtxt as rustc_query_system[f729307075c69a4c]::query::QueryContext>::load_side_effects
+  36:     0x7ffd1d8737a7 - rustc_hir_analysis[29f9d307fec685ab]::collect::type_of::type_of
+  37:     0x7ffd1d86ed11 - rustc_hir_analysis[29f9d307fec685ab]::collect::type_of::type_of
+  38:     0x7ffd1cf42f64 - rustc_hir_analysis[29f9d307fec685ab]::check_crate
+  39:     0x7ffd1a77f057 - rustc_interface[48481cd2bd45c52e]::passes::analysis
+  40:     0x7ffd1d1ac30d - rustc_query_impl[d6e88205cda22d72]::profiling_support::alloc_self_profile_query_strings
+  41:     0x7ffd1d1e0539 - rustc_query_impl[d6e88205cda22d72]::profiling_support::alloc_self_profile_query_strings
+  42:     0x7ffd1d1ddc1c - rustc_query_impl[d6e88205cda22d72]::profiling_support::alloc_self_profile_query_strings
+  43:     0x7ffd1d21b5fc - rustc_query_impl[d6e88205cda22d72]::profiling_support::alloc_self_profile_query_strings
+  44:     0x7ffd1d1f03da - rustc_query_impl[d6e88205cda22d72]::profiling_support::alloc_self_profile_query_strings
+  45:     0x7ffd1a73829b - <rustc_middle[bce21830c7cfe97d]::ty::SymbolName as core[754103fe75d1c74e]::fmt::Debug>::fmt
+  46:     0x7ffd1a7357dc - rustc_driver_impl[6c205a7523adf7e6]::args::arg_expand_all
+  47:     0x7ffd1a736d51 - rustc_driver_impl[6c205a7523adf7e6]::args::arg_expand_all
+  48:     0x7ffd2eb7b33c - std::sys::windows::thread::Thread::new::ha810e195e69c493c
+  49:     0x7ffdffc2257d - BaseThreadInitThunk
+  50:     0x7ffe0080aa58 - RtlUserThreadStart
+
+
+rustc version: 1.75.0-nightly (df871fbf0 2023-10-24)
+platform: x86_64-pc-windows-msvc
+
+query stack during panic:
+#0 [typeck] type-checking `day14::part2`
+#1 [analysis] running analysis passes on this crate
+end of query stack
