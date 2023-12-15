@@ -15,13 +15,7 @@ pub fn parse(input: &str) -> Vec<SpringRecord> {
                         if block.len() == 0 {
                             None
                         } else {
-                            Some(block.as_bytes().iter().fold(0, |acc, b| {
-                                if *b == b'?' {
-                                    (acc << 1) + 1
-                                } else {
-                                    (acc << 1) + 0
-                                }
-                            }))
+                            Some(block.as_bytes())
                         }
                     })
                     .collect(),
@@ -37,7 +31,7 @@ pub fn parse(input: &str) -> Vec<SpringRecord> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SpringRecord<'a> {
-    blocks: Vec<u32>,
+    blocks: Vec<&'a [u8]>,
     row: &'a [u8],
     pattern: Vec<usize>,
 }
