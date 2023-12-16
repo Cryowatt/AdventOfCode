@@ -57,6 +57,9 @@ fn main() {
         15 => {
             run_day!(15, day15::Day15);
         }
+        16 => {
+            run_day!(16, day16::Day16);
+        }
         _ => unimplemented!(),
     }
 }
