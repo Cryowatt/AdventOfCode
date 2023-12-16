@@ -1,6 +1,6 @@
-use bitflags::bitflags;
-
 use advent::*;
+use bitflags::bitflags;
+use rayon::prelude::*;
 
 advent_day!(Day16, parse, LaserChessBoard, part1, part2);
 
@@ -324,41 +324,22 @@ fn energized_tiles(input: &LaserChessBoard, starting_laser: (Point<i32>, LaserDi
 /// assert_eq!(51, part2(&input));
 /// ```
 pub fn part2(input: &LaserChessBoard) -> u32 {
-    let max_left_edge = (0..input.height as i32)
-        .map(|y| energized_tiles(input, (IPoint::new(0, y), LaserDirection::East)))
-        .max()
-        .unwrap();
+    let mut starting_positions = vec![];
+    for x in 0..input.width as i32 {
+        starting_positions.push((IPoint::new(x, 0), LaserDirection::South));
+        starting_positions.push((
+            IPoint::new(x, input.height as i32 - 1),
+            LaserDirection::North,
+        ));
+    }
+    for y in 0..input.height as i32 {
+        starting_positions.push((IPoint::new(0, y), LaserDirection::East));
+        starting_positions.push((IPoint::new(input.width as i32 - 1, y), LaserDirection::West));
+    }
 
-    let max_right_edge = (0..input.height as i32)
-        .map(|y| {
-            energized_tiles(
-                input,
-                (IPoint::new(input.width as i32 - 1, y), LaserDirection::West),
-            )
-        })
+    starting_positions
+        .par_iter()
+        .map(|laser| energized_tiles(input, *laser))
         .max()
-        .unwrap();
-
-    let max_top_edge = (0..input.width as i32)
-        .map(|x| energized_tiles(input, (IPoint::new(x, 0), LaserDirection::South)))
-        .max()
-        .unwrap();
-
-    let max_bottom_edge = (0..input.width as i32)
-        .map(|x| {
-            energized_tiles(
-                input,
-                (
-                    IPoint::new(x, input.height as i32 - 1),
-                    LaserDirection::North,
-                ),
-            )
-        })
-        .max()
-        .unwrap();
-
-    max_left_edge
-        .max(max_right_edge)
-        .max(max_top_edge)
-        .max(max_bottom_edge)
+        .unwrap()
 }
