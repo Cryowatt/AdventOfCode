@@ -14,24 +14,22 @@ pub fn parse<'a>(input: &'a str) -> Grid<'a> {
 
     Grid {
         cells: input.as_bytes(),
-        width: width as u32,
-        height: height as u32,
+        bounds: UPoint::new(width as u32, height as u32),
         stride: stride as u32,
     }
 }
 
 pub struct Grid<'a> {
     cells: &'a [u8],
-    width: u32,
-    height: u32,
     stride: u32,
+    bounds: UPoint,
 }
 
 impl<'a> Grid<'a> {
     fn has_at<F: FnOnce(u8) -> bool>(&self, position: UPoint, predicate: F) -> bool {
-        if position.x >= self.width {
+        if position.x >= self.bounds.x {
             false
-        } else if position.y >= self.height {
+        } else if position.y >= self.bounds.y {
             false
         } else {
             match (position.y * self.stride).checked_add(position.x) {
@@ -79,16 +77,16 @@ fn part_number(grid: &Grid, position: UPoint) -> Option<u32> {
             }
         };
 
-        let mut left = start.left();
+        let mut left = start.west_checked();
         while maybe_has_digit_at(left) {
             start = left.unwrap();
-            left = start.left();
+            left = start.west_checked();
             length += 1;
         }
 
-        let mut right = position.right();
+        let mut right = position.east_checked(&grid.bounds);
         while maybe_has_digit_at(right) {
-            right = right.unwrap().right();
+            right = right.unwrap().east_checked(&grid.bounds);
             length += 1;
         }
 
@@ -116,8 +114,8 @@ fn part_number(grid: &Grid, position: UPoint) -> Option<u32> {
 pub fn part1(grid: &Grid<'_>) -> u32 {
     let mut sum = 0;
 
-    for y in 0..grid.height {
-        for x in 0..grid.width {
+    for y in 0..grid.bounds.y {
+        for x in 0..grid.bounds.x {
             let here = UPoint::new(x as u32, y as u32);
 
             if grid.has_symbol_at(here) {
@@ -131,15 +129,16 @@ pub fn part1(grid: &Grid<'_>) -> u32 {
                         if let Some(part_num) = part_number(&grid, pos) {
                             part_num
                         } else {
-                            check_cell(pos.left()) + check_cell(pos.right())
+                            check_cell(pos.west_checked())
+                                + check_cell(pos.east_checked(&grid.bounds))
                         }
                     })
                 };
 
-                sum += check_cell(here.left());
-                sum += check_cell(here.right());
-                sum += check_row(here.up());
-                sum += check_row(here.down());
+                sum += check_cell(here.west_checked());
+                sum += check_cell(here.east_checked(&grid.bounds));
+                sum += check_row(here.north_checked());
+                sum += check_row(here.south_checked(&grid.bounds));
             }
         }
     }
@@ -165,8 +164,8 @@ pub fn part1(grid: &Grid<'_>) -> u32 {
 pub fn part2(grid: &Grid<'_>) -> u32 {
     let mut sum = 0;
 
-    for y in 0..grid.height {
-        for x in 0..grid.width {
+    for y in 0..grid.bounds.y {
+        for x in 0..grid.bounds.x {
             let here = UPoint::new(x as u32, y as u32);
 
             if grid.has_gear_at(here) {
@@ -181,8 +180,8 @@ pub fn part2(grid: &Grid<'_>) -> u32 {
                     if checks[0].is_none() {
                         maybe_position.map(|pos| {
                             if None == checks[0] {
-                                checks[1] = check_cell(pos.left());
-                                checks[2] = check_cell(pos.right())
+                                checks[1] = check_cell(pos.west_checked());
+                                checks[2] = check_cell(pos.east_checked(&grid.bounds))
                             }
                         });
                     }
@@ -191,10 +190,10 @@ pub fn part2(grid: &Grid<'_>) -> u32 {
                 let mut checks: [Option<u32>; 8] = [None; 8];
 
                 // I probably could short-circuit something here if the 2-adjacent requirement is violated
-                checks[0] = check_cell(here.left());
-                checks[1] = check_cell(here.right());
-                check_row(here.up(), &mut checks[2..5]);
-                check_row(here.down(), &mut checks[5..8]);
+                checks[0] = check_cell(here.west_checked());
+                checks[1] = check_cell(here.east_checked(&grid.bounds));
+                check_row(here.north_checked(), &mut checks[2..5]);
+                check_row(here.south_checked(&grid.bounds), &mut checks[5..8]);
 
                 let mut product = 1;
                 let mut count = 0;

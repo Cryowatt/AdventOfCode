@@ -9,11 +9,53 @@ pub struct Point<T> {
 
 impl<T> Point<T>
 where
-    T: num_traits::CheckedSub
+    T: num_traits::Unsigned
+        + PartialOrd
+        + num_traits::CheckedSub
         + num_traits::CheckedAdd
         + num_traits::identities::One
         + num_traits::identities::Zero
         + Copy,
+{
+    pub fn south_checked(&self, bounds: &Point<T>) -> Option<Self> {
+        let y = self.y + T::one();
+        if y < bounds.y {
+            Some(Self::new(self.x, y))
+        } else {
+            None
+        }
+    }
+
+    pub fn north_checked(&self) -> Option<Self> {
+        Some(Self::new(self.x, self.y.checked_sub(&T::one())?))
+    }
+
+    pub fn east_checked(&self, bounds: &Point<T>) -> Option<Self> {
+        let x = self.x + T::one();
+        if x < bounds.x {
+            Some(Self::new(x, self.y))
+        } else {
+            None
+        }
+    }
+
+    pub fn west_checked(&self) -> Option<Self> {
+        Some(Self::new(self.x.checked_sub(&T::one())?, self.y))
+    }
+
+    pub fn direction_checked(&self, direction: Direction, bounds: &Point<T>) -> Option<Self> {
+        match direction {
+            Direction::North => self.north_checked(),
+            Direction::South => self.south_checked(bounds),
+            Direction::East => self.east_checked(bounds),
+            Direction::West => self.west_checked(),
+        }
+    }
+}
+
+impl<T> Point<T>
+where
+    T: num_traits::identities::Zero + Copy,
 {
     pub fn new(x: T, y: T) -> Self {
         Self { x, y }
@@ -25,45 +67,62 @@ where
             y: T::zero(),
         }
     }
+}
 
-    pub fn north(&self) -> Option<Self> {
+impl<T> Point<T>
+where
+    T: num_traits::Signed + num_traits::identities::One + num_traits::identities::Zero + Copy,
+{
+    pub fn north(&self) -> Self {
         self.up()
     }
 
-    pub fn south(&self) -> Option<Self> {
+    pub fn south(&self) -> Self {
         self.down()
     }
 
-    pub fn east(&self) -> Option<Self> {
+    pub fn east(&self) -> Self {
         self.right()
     }
 
-    pub fn west(&self) -> Option<Self> {
+    pub fn west(&self) -> Self {
         self.left()
     }
 
-    pub fn left(&self) -> Option<Self> {
-        self.x.checked_sub(&T::one()).map(|x| Self::new(x, self.y))
+    pub fn left(&self) -> Self {
+        Self::new(self.x - T::one(), self.y)
     }
 
-    pub fn right(&self) -> Option<Self> {
-        self.x.checked_add(&T::one()).map(|x| Self::new(x, self.y))
+    pub fn right(&self) -> Self {
+        Self::new(self.x + T::one(), self.y)
     }
 
-    pub fn up(&self) -> Option<Self> {
-        self.y.checked_sub(&T::one()).map(|y| Self::new(self.x, y))
+    pub fn up(&self) -> Self {
+        Self::new(self.x, self.y - T::one())
     }
 
-    pub fn down(&self) -> Option<Self> {
-        self.y.checked_add(&T::one()).map(|y| Self::new(self.x, y))
+    pub fn down(&self) -> Self {
+        Self::new(self.x, self.y + T::one())
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Direction {
     North,
     South,
     East,
     West,
+}
+
+impl Direction {
+    pub fn opposite(&self) -> Direction {
+        match self {
+            Direction::North => Direction::South,
+            Direction::South => Direction::North,
+            Direction::East => Direction::West,
+            Direction::West => Direction::East,
+        }
+    }
 }
 
 pub trait Manhattan {

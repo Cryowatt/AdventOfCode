@@ -40,8 +40,7 @@ pub fn part1(input: &Vec<Direction>) -> u32 {
             Direction::South => location.south(),
             Direction::East => location.east(),
             Direction::West => location.west(),
-        }
-        .unwrap();
+        };
         visited.insert(location);
     }
 
@@ -72,8 +71,7 @@ pub fn part2(input: &Vec<Direction>) -> u32 {
             Direction::South => location.south(),
             Direction::East => location.east(),
             Direction::West => location.west(),
-        }
-        .unwrap();
+        };
         visited.insert(location);
 
         robo_location = match directions[1] {
@@ -81,8 +79,7 @@ pub fn part2(input: &Vec<Direction>) -> u32 {
             Direction::South => robo_location.south(),
             Direction::East => robo_location.east(),
             Direction::West => robo_location.west(),
-        }
-        .unwrap();
+        };
         visited.insert(robo_location);
     }
 
