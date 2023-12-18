@@ -24,6 +24,10 @@ pub fn parse(input: &str) -> PipeMap {
                     .collect()
             })
             .collect(),
+        bounds: UPoint::new(
+            input.lines().next().unwrap().len() as u32,
+            input.lines().count() as u32,
+        ),
     }
 }
 
@@ -42,6 +46,7 @@ bitflags! {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PipeMap {
     rows: Vec<Vec<PipeEnds>>,
+    bounds: UPoint,
 }
 
 impl PipeMap {
@@ -108,14 +113,14 @@ pub fn part1(map: &PipeMap) -> u32 {
     };
 
     // Check around the start position for the first step
-    let mut position = if check_direction(start.up(), PipeEnds::South) {
-        (PipeEnds::South, start.up().unwrap())
-    } else if check_direction(start.left(), PipeEnds::East) {
-        (PipeEnds::East, start.left().unwrap())
-    } else if check_direction(start.right(), PipeEnds::West) {
-        (PipeEnds::West, start.right().unwrap())
-    } else if check_direction(start.down(), PipeEnds::North) {
-        (PipeEnds::North, start.down().unwrap())
+    let mut position = if check_direction(start.north_checked(), PipeEnds::South) {
+        (PipeEnds::South, start.north_checked().unwrap())
+    } else if check_direction(start.west_checked(), PipeEnds::East) {
+        (PipeEnds::East, start.west_checked().unwrap())
+    } else if check_direction(start.east_checked(&map.bounds), PipeEnds::West) {
+        (PipeEnds::West, start.east_checked(&map.bounds).unwrap())
+    } else if check_direction(start.south_checked(&map.bounds), PipeEnds::North) {
+        (PipeEnds::North, start.south_checked(&map.bounds).unwrap())
     } else {
         unreachable!();
     };
@@ -126,10 +131,16 @@ pub fn part1(map: &PipeMap) -> u32 {
     while position.1 != start {
         let cell = map.cell(position.1);
         position = match cell.difference(position.0) {
-            PipeEnds::North => (PipeEnds::South, position.1.up().unwrap()),
-            PipeEnds::South => (PipeEnds::North, position.1.down().unwrap()),
-            PipeEnds::East => (PipeEnds::West, position.1.right().unwrap()),
-            PipeEnds::West => (PipeEnds::East, position.1.left().unwrap()),
+            PipeEnds::North => (PipeEnds::South, position.1.north_checked().unwrap()),
+            PipeEnds::South => (
+                PipeEnds::North,
+                position.1.south_checked(&map.bounds).unwrap(),
+            ),
+            PipeEnds::East => (
+                PipeEnds::West,
+                position.1.east_checked(&map.bounds).unwrap(),
+            ),
+            PipeEnds::West => (PipeEnds::East, position.1.west_checked().unwrap()),
             _ => unreachable!(),
         };
         distance += 1;
@@ -216,18 +227,18 @@ pub fn part2(map: &PipeMap) -> u32 {
     };
 
     // Check around the start position for the first step
-    let mut position = if check_direction(start.up(), PipeEnds::South) {
+    let mut position = if check_direction(start.north_checked(), PipeEnds::South) {
         map.rows[start.y as usize][start.x as usize] |= PipeEnds::South;
-        (PipeEnds::South, start.up().unwrap())
-    } else if check_direction(start.left(), PipeEnds::East) {
+        (PipeEnds::South, start.north_checked().unwrap())
+    } else if check_direction(start.west_checked(), PipeEnds::East) {
         map.rows[start.y as usize][start.x as usize] |= PipeEnds::East;
-        (PipeEnds::East, start.left().unwrap())
-    } else if check_direction(start.right(), PipeEnds::West) {
+        (PipeEnds::East, start.west_checked().unwrap())
+    } else if check_direction(start.east_checked(&map.bounds), PipeEnds::West) {
         map.rows[start.y as usize][start.x as usize] |= PipeEnds::West;
-        (PipeEnds::West, start.right().unwrap())
-    } else if check_direction(start.down(), PipeEnds::North) {
+        (PipeEnds::West, start.east_checked(&map.bounds).unwrap())
+    } else if check_direction(start.south_checked(&map.bounds), PipeEnds::North) {
         map.rows[start.y as usize][start.x as usize] |= PipeEnds::North;
-        (PipeEnds::North, start.down().unwrap())
+        (PipeEnds::North, start.south_checked(&map.bounds).unwrap())
     } else {
         unreachable!();
     };
@@ -236,10 +247,16 @@ pub fn part2(map: &PipeMap) -> u32 {
     while position.1 != start {
         let cell = map.mark_cell(position.1);
         position = match cell.difference(position.0) {
-            PipeEnds::North => (PipeEnds::South, position.1.up().unwrap()),
-            PipeEnds::South => (PipeEnds::North, position.1.down().unwrap()),
-            PipeEnds::East => (PipeEnds::West, position.1.right().unwrap()),
-            PipeEnds::West => (PipeEnds::East, position.1.left().unwrap()),
+            PipeEnds::North => (PipeEnds::South, position.1.north_checked().unwrap()),
+            PipeEnds::South => (
+                PipeEnds::North,
+                position.1.south_checked(&map.bounds).unwrap(),
+            ),
+            PipeEnds::East => (
+                PipeEnds::West,
+                position.1.east_checked(&map.bounds).unwrap(),
+            ),
+            PipeEnds::West => (PipeEnds::East, position.1.west_checked().unwrap()),
             _ => unreachable!(),
         };
     }

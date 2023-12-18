@@ -136,65 +136,65 @@ fn energized_tiles(input: &LaserChessBoard, starting_laser: (Point<i32>, LaserDi
         TileType::Oblivion => {}
         TileType::ForwardMirror => match incident_laser {
             LaserDirection::North => {
-                pending_lasers.push((tile.location.east().unwrap(), LaserDirection::East))
+                pending_lasers.push((tile.location.east(), LaserDirection::East))
             }
             LaserDirection::East => {
-                pending_lasers.push((tile.location.north().unwrap(), LaserDirection::North))
+                pending_lasers.push((tile.location.north(), LaserDirection::North))
             }
             LaserDirection::West => {
-                pending_lasers.push((tile.location.south().unwrap(), LaserDirection::South))
+                pending_lasers.push((tile.location.south(), LaserDirection::South))
             }
             LaserDirection::South => {
-                pending_lasers.push((tile.location.west().unwrap(), LaserDirection::West))
+                pending_lasers.push((tile.location.west(), LaserDirection::West))
             }
             _ => unreachable!(),
         },
         TileType::BackMirror => match incident_laser {
             LaserDirection::North => {
-                pending_lasers.push((tile.location.west().unwrap(), LaserDirection::West))
+                pending_lasers.push((tile.location.west(), LaserDirection::West))
             }
             LaserDirection::East => {
-                pending_lasers.push((tile.location.south().unwrap(), LaserDirection::South))
+                pending_lasers.push((tile.location.south(), LaserDirection::South))
             }
             LaserDirection::West => {
-                pending_lasers.push((tile.location.north().unwrap(), LaserDirection::North))
+                pending_lasers.push((tile.location.north(), LaserDirection::North))
             }
             LaserDirection::South => {
-                pending_lasers.push((tile.location.east().unwrap(), LaserDirection::East))
+                pending_lasers.push((tile.location.east(), LaserDirection::East))
             }
             _ => unreachable!(),
         },
         TileType::HorizontalSplitter => match incident_laser {
             LaserDirection::North => {
-                pending_lasers.push((tile.location.west().unwrap(), LaserDirection::West));
-                pending_lasers.push((tile.location.east().unwrap(), LaserDirection::East));
+                pending_lasers.push((tile.location.west(), LaserDirection::West));
+                pending_lasers.push((tile.location.east(), LaserDirection::East));
             }
             LaserDirection::East => {
-                pending_lasers.push((tile.location.east().unwrap(), LaserDirection::East))
+                pending_lasers.push((tile.location.east(), LaserDirection::East))
             }
             LaserDirection::West => {
-                pending_lasers.push((tile.location.west().unwrap(), LaserDirection::West))
+                pending_lasers.push((tile.location.west(), LaserDirection::West))
             }
             LaserDirection::South => {
-                pending_lasers.push((tile.location.west().unwrap(), LaserDirection::West));
-                pending_lasers.push((tile.location.east().unwrap(), LaserDirection::East));
+                pending_lasers.push((tile.location.west(), LaserDirection::West));
+                pending_lasers.push((tile.location.east(), LaserDirection::East));
             }
             _ => unreachable!(),
         },
         TileType::VerticalSplitter => match incident_laser {
             LaserDirection::North => {
-                pending_lasers.push((tile.location.north().unwrap(), LaserDirection::North))
+                pending_lasers.push((tile.location.north(), LaserDirection::North))
             }
             LaserDirection::East => {
-                pending_lasers.push((tile.location.north().unwrap(), LaserDirection::North));
-                pending_lasers.push((tile.location.south().unwrap(), LaserDirection::South));
+                pending_lasers.push((tile.location.north(), LaserDirection::North));
+                pending_lasers.push((tile.location.south(), LaserDirection::South));
             }
             LaserDirection::West => {
-                pending_lasers.push((tile.location.north().unwrap(), LaserDirection::North));
-                pending_lasers.push((tile.location.south().unwrap(), LaserDirection::South));
+                pending_lasers.push((tile.location.north(), LaserDirection::North));
+                pending_lasers.push((tile.location.south(), LaserDirection::South));
             }
             LaserDirection::South => {
-                pending_lasers.push((tile.location.south().unwrap(), LaserDirection::South))
+                pending_lasers.push((tile.location.south(), LaserDirection::South))
             }
             _ => unreachable!(),
         },
