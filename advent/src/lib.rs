@@ -141,8 +141,8 @@ impl Manhattan for UPoint {
 #[macro_export]
 macro_rules! run_day {
     ($id:literal, $day:path) => {
-        print!("Day {}#\t[{:<15}]", $id, <$day>::part1());
-        println!(" [{:<15}]", <$day>::part2());
+        print!("Day {}#\t[{:<20}]", $id, <$day>::part1());
+        println!(" [{:<20}]", <$day>::part2());
     };
 }
 
