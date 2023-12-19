@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::OnceLock};
+use std::{collections::HashMap, ops::RangeInclusive, sync::OnceLock};
 
 use advent::*;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
@@ -12,7 +12,6 @@ pub struct PartsSystem<'a> {
 }
 
 struct Workflow<'a> {
-    name: &'a str,
     rules: Vec<Rule<'a>>,
     fallback: Target<'a>,
 }
@@ -96,14 +95,13 @@ pub fn parse(input: &str) -> PartsSystem {
         Regex::new(r"\{x=(?P<x>\d+),m=(?P<m>\d+),a=(?P<a>\d+),s=(?P<s>\d+)\}").unwrap()
     });
 
-    fn parse_workflow<'a>(name: &'a str, rules: &'a str, fallback: &'a str) -> Workflow<'a> {
+    fn parse_workflow<'a>(rules: &'a str, fallback: &'a str) -> Workflow<'a> {
         let rule_match = RULE_MATCH.get_or_init(|| {
             Regex::new(r"(?:(?P<cat>[xmas])(?P<op>[<>])(?P<operand>\d+):(?P<target>[AR]|\w+))")
                 .unwrap()
         });
 
         Workflow {
-            name,
             rules: rule_match
                 .captures_iter(rules)
                 .map(|rule_capture| Rule {
@@ -156,7 +154,6 @@ pub fn parse(input: &str) -> PartsSystem {
                     (
                         workflow.name("name").unwrap().as_str(),
                         parse_workflow(
-                            workflow.name("name").unwrap().as_str(),
                             workflow.name("rules").unwrap().as_str(),
                             workflow.name("fallback").unwrap().as_str(),
                         ),
@@ -243,6 +240,147 @@ pub fn part1(system: &PartsSystem) -> u32 {
 /// assert_eq!(167409079868000, part2(&input));
 /// ```
 pub fn part2(system: &PartsSystem) -> u64 {
-    // FUCK
-    0
+    #[derive(Clone)]
+    struct PartPattern {
+        x: RangeInclusive<u16>,
+        m: RangeInclusive<u16>,
+        a: RangeInclusive<u16>,
+        s: RangeInclusive<u16>,
+    }
+
+    impl PartPattern {
+        fn new() -> Self {
+            Self {
+                x: 1..=4000,
+                m: 1..=4000,
+                a: 1..=4000,
+                s: 1..=4000,
+            }
+        }
+
+        fn combinations(&self) -> u64 {
+            self.x.len() as u64 * self.m.len() as u64 * self.a.len() as u64 * self.s.len() as u64
+        }
+
+        fn refine(&self, rule: &Rule) -> Self {
+            fn refine_range(range: &RangeInclusive<u16>, rule: &Rule) -> RangeInclusive<u16> {
+                match rule.operator {
+                    Operator::GreaterThan => rule.operand + 1..=*range.end(),
+                    Operator::LessThan => *range.start()..=rule.operand - 1,
+                }
+            }
+
+            match rule.category {
+                Category::X => Self {
+                    x: refine_range(&self.x, rule),
+                    m: self.m.clone(),
+                    a: self.a.clone(),
+                    s: self.s.clone(),
+                },
+                Category::M => Self {
+                    x: self.x.clone(),
+                    m: refine_range(&self.m, rule),
+                    a: self.a.clone(),
+                    s: self.s.clone(),
+                },
+                Category::A => Self {
+                    x: self.x.clone(),
+                    m: self.m.clone(),
+                    a: refine_range(&self.a, rule),
+                    s: self.s.clone(),
+                },
+                Category::S => Self {
+                    x: self.x.clone(),
+                    m: self.m.clone(),
+                    a: self.a.clone(),
+                    s: refine_range(&self.s, rule),
+                },
+            }
+        }
+
+        fn inverse_refine(&self, rule: &Rule) -> Self {
+            fn inverse_refine_range(
+                range: &RangeInclusive<u16>,
+                rule: &Rule,
+            ) -> RangeInclusive<u16> {
+                match rule.operator {
+                    Operator::GreaterThan => *range.start()..=rule.operand,
+                    Operator::LessThan => rule.operand..=*range.end(),
+                }
+            }
+
+            match rule.category {
+                Category::X => Self {
+                    x: inverse_refine_range(&self.x, rule),
+                    m: self.m.clone(),
+                    a: self.a.clone(),
+                    s: self.s.clone(),
+                },
+                Category::M => Self {
+                    x: self.x.clone(),
+                    m: inverse_refine_range(&self.m, rule),
+                    a: self.a.clone(),
+                    s: self.s.clone(),
+                },
+                Category::A => Self {
+                    x: self.x.clone(),
+                    m: self.m.clone(),
+                    a: inverse_refine_range(&self.a, rule),
+                    s: self.s.clone(),
+                },
+                Category::S => Self {
+                    x: self.x.clone(),
+                    m: self.m.clone(),
+                    a: self.a.clone(),
+                    s: inverse_refine_range(&self.s, rule),
+                },
+            }
+        }
+    }
+
+    let entry_workflow = system.workflows.get("in").unwrap();
+    let mut valid_patterns = vec![];
+
+    fn find_patterns(
+        system: &PartsSystem,
+        workflow: &Workflow,
+        pattern: PartPattern,
+        valid_patterns: &mut Vec<PartPattern>,
+    ) {
+        let mut current_pattern = pattern;
+
+        for rule in workflow.rules.iter() {
+            match rule.target {
+                Target::Accept => valid_patterns.push(current_pattern.refine(rule)),
+                Target::Reject => {}
+                Target::Workflow(target_workflow) => find_patterns(
+                    system,
+                    system.workflows.get(target_workflow).unwrap(),
+                    current_pattern.refine(rule),
+                    valid_patterns,
+                ),
+            }
+            current_pattern = current_pattern.inverse_refine(rule);
+        }
+
+        match workflow.fallback {
+            Target::Accept => valid_patterns.push(current_pattern),
+            Target::Reject => {}
+            Target::Workflow(target_workflow) => find_patterns(
+                system,
+                system.workflows.get(target_workflow).unwrap(),
+                current_pattern,
+                valid_patterns,
+            ),
+        }
+    }
+
+    find_patterns(
+        &system,
+        &entry_workflow,
+        PartPattern::new(),
+        &mut valid_patterns,
+    );
+
+    valid_patterns.iter().map(|pat| pat.combinations()).sum()
 }
