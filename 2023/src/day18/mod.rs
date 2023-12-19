@@ -2,6 +2,7 @@ use std::{collections::HashMap, ops::RangeInclusive};
 
 use advent::*;
 use bitflags::*;
+use rayon::vec;
 use regex::Regex;
 
 advent_day!(Day18, parse, DigPlan, part1, part2);
@@ -68,6 +69,29 @@ pub fn parse(input: &str) -> DigPlan {
 /// assert_eq!(62, part1(&input));
 /// ```
 pub fn part1(plan: &DigPlan) -> u32 {
+    // let mut instruction = plan.intructions.clone();
+    // instruction.push(instruction.first().unwrap().clone());
+
+    let mut points = vec![IPoint::origin()];
+    points.extend(plan.intructions.iter().scan(Point::origin(), |last, step| {
+        *last = match step.direction {
+            Direction::East => Point::new(last.x + step.length as i32 + 1, last.y),
+            Direction::West => Point::new(last.x - step.length as i32, last.y),
+            Direction::South => Point::new(last.x, last.y + step.length as i32 + 1),
+            Direction::North => Point::new(last.x, last.y - step.length as i32 + 1),
+        };
+        Some(*last)
+    }));
+    points.push(IPoint::origin());
+    let total = points
+        .windows(2)
+        .map(|pairs| pairs[0].x * pairs[1].y - pairs[1].x * pairs[0].y)
+        .sum::<i32>();
+    return total.abs() as u32 / 2;
+    // let first = plan.intructions.first().unwrap();
+    // plan.intructions.append(other)
+    // plan.intructions.iter().
+
     let mut row_map = HashMap::<i32, Vec<(i32, Orientation)>>::new();
     let mut position = IPoint::origin();
     let mut perimeter = 0;
@@ -108,7 +132,6 @@ pub fn part1(plan: &DigPlan) -> u32 {
                     Orientation::North | Orientation::South
                 };
 
-                println!("{x} {y}");
                 match row_map.get_mut(&y) {
                     Some(dug) => match dug.binary_search_by(|probe| probe.0.cmp(&x)) {
                         Ok(index) => {
