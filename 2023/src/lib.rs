@@ -5,6 +5,7 @@
 #![feature(int_roundings)]
 #![feature(isqrt)]
 #![feature(iter_map_windows)]
+#![feature(lazy_cell)]
 #![feature(test)]
 
 pub mod day01;
@@ -25,3 +26,4 @@ pub mod day15;
 pub mod day16;
 pub mod day17;
 pub mod day18;
+pub mod day19;
