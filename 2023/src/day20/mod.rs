@@ -14,7 +14,7 @@ pub fn parse(input: &str) -> &str {
 /// //assert_eq!(?, part1(&input));
 /// ```
 pub fn part1(_input: &str) -> u32 {
-    0s
+    0
 }
 
 /// ```rust
