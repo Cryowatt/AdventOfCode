@@ -55,44 +55,44 @@ impl PathState {
         }
     }
 
-    fn next_state_ultra(&self, direction: Direction, map: &HeatMap) -> Option<PathState> {
-        if self.direction.opposite() == direction {
-            None
-        } else {
-            if self.direction != direction {
-                // Freshly turned, take 4 steps if possible
-                let fk = self
-                    .next_state(direction, map, 10)
-                    .and_then(|state| state.next_state(direction, map, 10))
-                    .and_then(|state| state.next_state(direction, map, 10))
-                    .and_then(|state| state.next_state(direction, map, 10));
-                // if let Some(fk) = fk {
-                //     println!(
-                //         "Turn {} step: {} ({}, {}) => ({}, {})",
-                //         fk.steps, fk.heat, self.point.x, self.point.y, fk.point.x, fk.point.y
-                //     );
-                // }
-                fk
-            } else if let Some(point) = self.point.direction_checked(direction, &map.bounds) {
-                let steps = self.steps + 1;
+    // fn next_state_ultra(&self, direction: Direction, map: &HeatMap) -> Option<PathState> {
+    //     if self.direction.opposite() == direction {
+    //         None
+    //     } else {
+    //         if self.direction != direction {
+    //             // Freshly turned, take 4 steps if possible
+    //             let fk = self
+    //                 .next_state(direction, map, 10)
+    //                 .and_then(|state| state.next_state(direction, map, 10))
+    //                 .and_then(|state| state.next_state(direction, map, 10))
+    //                 .and_then(|state| state.next_state(direction, map, 10));
+    //             // if let Some(fk) = fk {
+    //             //     println!(
+    //             //         "Turn {} step: {} ({}, {}) => ({}, {})",
+    //             //         fk.steps, fk.heat, self.point.x, self.point.y, fk.point.x, fk.point.y
+    //             //     );
+    //             // }
+    //             fk
+    //         } else if let Some(point) = self.point.direction_checked(direction, &map.bounds) {
+    //             let steps = self.steps + 1;
 
-                if steps <= 10 {
-                    let heat = self.heat + map.blocks[point.y as usize][point.x as usize] as u32;
-                    Some(PathState {
-                        point,
-                        distance: point.manhattan(&map.end),
-                        heat,
-                        direction,
-                        steps,
-                    })
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        }
-    }
+    //             if steps <= 10 {
+    //                 let heat = self.heat + map.blocks[point.y as usize][point.x as usize] as u32;
+    //                 Some(PathState {
+    //                     point,
+    //                     distance: point.manhattan(&map.end),
+    //                     heat,
+    //                     direction,
+    //                     steps,
+    //                 })
+    //             } else {
+    //                 None
+    //             }
+    //         } else {
+    //             None
+    //         }
+    //     }
+    // }
 }
 
 impl Ord for PathState {
@@ -310,7 +310,7 @@ pub fn part1(input: &HeatMap) -> u32 {
 /// 1224686865563
 /// 2546548887735
 /// 4322674655533");
-/// //assert_eq!(94, part2(&input));
+/// assert_eq!(94, part2(&input));
 /// ```
 /// ```rust
 /// use advent_of_code_2023::day17::*;
@@ -320,45 +320,64 @@ pub fn part1(input: &HeatMap) -> u32 {
 /// 999999999991
 /// 999999999991
 /// 999999999991");
-/// //assert_eq!(71, part2(&input));
+/// assert_eq!(71, part2(&input));
 /// ```
 pub fn part2(input: &HeatMap) -> u32 {
-    return 0;
     fn enumerate_moves(
         state: PathState,
         heap: &mut BinaryHeap<Reverse<PathState>>,
         best_heat: &mut Vec<Vec<Record>>,
         map: &HeatMap,
     ) {
-        for potential_state in [
-            state.next_state_ultra(Direction::North, map),
-            state.next_state_ultra(Direction::South, map),
-            state.next_state_ultra(Direction::West, map),
-            state.next_state_ultra(Direction::East, map),
-        ] {
-            if let Some(valid_state) = potential_state {
-                // if valid_state.steps < 4 {
-                //     heap.push(valid_state);
-                // } else
-                if best_heat[valid_state.point.y as usize][valid_state.point.x as usize]
-                    .is_better(valid_state)
-                {
-                    // println!(
-                    //     "Queue heat H{} F{} ({}, {})",
-                    //     state.heat,
-                    //     state.fitness(),
-                    //     valid_state.point.x,
-                    //     valid_state.point.y
-                    // );
-                    heap.push(Reverse(valid_state));
+        if let Some(valid_state) = state.next_state(state.direction, map, 10) {
+            // Doing a best match for the forward direction just doesn't work
+            heap.push(Reverse(valid_state));
+        }
+
+        if state.steps >= 4 {
+            for potential_state in [
+                state.next_state(state.direction.right(), map, 10),
+                state.next_state(state.direction.left(), map, 10),
+            ] {
+                if let Some(valid_state) = potential_state {
+                    // if best_heat[valid_state.point.y as usize][valid_state.point.x as usize]
+                    //     .is_better(valid_state)
+                    {
+                        heap.push(Reverse(valid_state));
+                    }
                 }
             }
         }
+
+        // for potential_state in [
+        //     state.next_state_ultra(Direction::North, map),
+        //     state.next_state_ultra(Direction::South, map),
+        //     state.next_state_ultra(Direction::West, map),
+        //     state.next_state_ultra(Direction::East, map),
+        // ] {
+        //     if let Some(valid_state) = potential_state {
+        //         // if valid_state.steps < 4 {
+        //         //     heap.push(valid_state);
+        //         // } else
+        //         if best_heat[valid_state.point.y as usize][valid_state.point.x as usize]
+        //             .is_better(valid_state)
+        //         {
+        //             // println!(
+        //             //     "Queue heat H{} F{} ({}, {})",
+        //             //     state.heat,
+        //             //     state.fitness(),
+        //             //     valid_state.point.x,
+        //             //     valid_state.point.y
+        //             // );
+        //             heap.push(Reverse(valid_state));
+        //         }
+        //     }
+        // }
     }
 
     let mut priority_queue = BinaryHeap::<Reverse<PathState>>::new();
     let mut best_heat: Vec<Vec<Record>> = vec![];
-    let end = UPoint::new(input.bounds.x - 1, input.bounds.y - 1);
+    // let end = UPoint::new(input.bounds.x - 1, input.bounds.y - 1);
 
     for _y in 0..input.bounds.y {
         let mut row = vec![];
@@ -373,38 +392,26 @@ pub fn part2(input: &HeatMap) -> u32 {
         best_heat.push(row);
     }
 
-    priority_queue.push(Reverse(PathState {
+    let start = PathState {
         point: UPoint::origin(),
         distance: UPoint::origin().manhattan(&input.end),
         heat: 0,
         direction: Direction::East,
-        steps: 1,
-    }));
+        steps: 0,
+    };
 
-    // let mut best_heat = PathState {
-    //     point: UPoint::origin(),
-    //     distance: u32::MAX,
-    //     heat: u32::MAX,
-    //     direction: Direction::East,
-    //     steps: u8::MAX,
-    // };
+    best_heat[0][0].north = Some(start);
+    best_heat[0][0].south = Some(start);
+    best_heat[0][0].east = Some(start);
+    best_heat[0][0].west = Some(start);
+
+    priority_queue.push(Reverse(start));
 
     while let Some(state) = priority_queue.pop() {
         let state = state.0;
-        // print!("{}, ", state.heat);
-        // println!(
-        //     "State {} ({}, {})",
-        //     state.fitness(),
-        //     state.point.x,
-        //     state.point.y
-        // );
-        if state.point == end {
-            return state.heat;
-            // if state < best_heat {
-            //     best_heat = state;
 
-            //     if st
-            // }
+        if state.point == input.end && state.steps >= 4 {
+            return state.heat;
         }
 
         enumerate_moves(state, &mut priority_queue, &mut best_heat, input);
