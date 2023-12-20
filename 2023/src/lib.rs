@@ -6,6 +6,7 @@
 #![feature(isqrt)]
 #![feature(iter_map_windows)]
 #![feature(lazy_cell)]
+#![feature(new_uninit)]
 #![feature(test)]
 
 pub mod day01;
