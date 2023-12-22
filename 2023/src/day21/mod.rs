@@ -216,29 +216,20 @@ pub fn part2(input: &GardenMap) -> u64 {
 
     // Full block
     let (full_even, full_odd) = plot_count(start, input, 0, MAX_STEPS);
+    let odd_blocks = (((blocks_to_edge as u64 - 1) / 2) * 2 + 1).pow(2) as u64;
+    let even_blocks = (((blocks_to_edge as u64) / 2) * 2).pow(2) as u64;
 
-    let row_steps = |y| {
-        let full_blocks_length = ((blocks_to_edge * 2) + 1) - 2 - (y * 2);
-
-        let odd_blocks = full_blocks_length / 2;
-        let even_blocks = full_blocks_length - odd_blocks;
-
-        ((odd_blocks * full_odd) + (even_blocks * full_even)) as u64
-    };
-
-    total_plots += row_steps(0);
-
-    for y in 1..blocks_to_edge {
-        total_plots += north_east as u64
+    total_plots += odd_blocks * full_odd as u64;
+    total_plots += even_blocks * full_even as u64;
+    total_plots += (blocks_to_edge - 1) as u64
+        * (north_east as u64
             + north_west as u64
             + south_east as u64
             + south_west as u64
             + inner_north_east as u64
             + inner_north_west as u64
             + inner_south_east as u64
-            + inner_south_west as u64
-            + (row_steps(y) * 2);
-    }
+            + inner_south_west as u64);
 
     total_plots
 }

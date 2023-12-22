@@ -188,12 +188,14 @@ macro_rules! advent_day {
 
             #[bench]
             fn part1_bench(b: &mut test::Bencher) {
+                b.bytes = super::INPUT.len() as u64;
                 let input = super::parse(super::INPUT);
                 b.iter(|| test::black_box(super::$part1_func(&input)));
             }
 
             #[bench]
             fn part2_bench(b: &mut test::Bencher) {
+                b.bytes = super::INPUT.len() as u64;
                 let input = super::parse(super::INPUT);
                 b.iter(|| test::black_box(super::$part2_func(&input)));
             }
