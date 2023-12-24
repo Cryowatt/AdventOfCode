@@ -96,7 +96,7 @@ pub fn parse(input: &str) -> Map {
 ///######################.#");
 /// assert_eq!(94, part1(&input));
 /// ```
-pub fn part1(map: &Map) -> u64 {
+pub fn part1(map: &Map) -> u32 {
     let mut nodes = HashMap::new();
     let mut edges: HashMap<Point<u32>, Vec<Point<u32>>> = HashMap::new();
 
@@ -223,7 +223,7 @@ pub fn part1(map: &Map) -> u64 {
         }
     }
 
-    longest_path.get(&map.end).unwrap().to_owned() as u64
+    longest_path.get(&map.end).unwrap().to_owned()
 }
 
 /// ```rust
@@ -252,8 +252,141 @@ pub fn part1(map: &Map) -> u64 {
 ///##.###.###.#.###.#.#v###
 ///##.....###...###...#...#
 ///######################.#");
-/// //assert_eq!(?, part2(&input));
+/// assert_eq!(154, part2(&input));
 /// ```
-pub fn part2(map: &Map) -> u64 {
-    todo!()
+pub fn part2(map: &Map) -> u32 {
+    fn add_edge(
+        from: UPoint,
+        to: UPoint,
+        length: u32,
+        edges: &mut HashMap<Point<u32>, HashSet<(Point<u32>, u32)>>,
+    ) {
+        if let Some(edge_set) = edges.get_mut(&from) {
+            edge_set.insert((to, length));
+        } else {
+            edges.insert(from, HashSet::from([(to, length)]));
+        }
+
+        if let Some(edge_set) = edges.get_mut(&to) {
+            edge_set.insert((from, length));
+        } else {
+            edges.insert(to, HashSet::from([(from, length)]));
+        }
+    }
+    let mut nodes = HashSet::from([map.start, map.end]);
+    let mut edges: HashMap<Point<u32>, HashSet<(Point<u32>, u32)>> = HashMap::new();
+
+    // Trace path to the fork
+    let mut open_paths = VecDeque::from([(map.start, Direction::South)]);
+    let mut closed_paths = HashSet::new();
+
+    while let Some((start_position, start_direction)) = open_paths.pop_front() {
+        // Correcting start position
+        let start_node = if start_position != map.start {
+            start_position
+                .direction_checked(start_direction.opposite(), &map.bounds)
+                .unwrap()
+        } else {
+            start_position
+        };
+
+        if closed_paths.contains(&start_position) {
+            continue;
+        }
+
+        let mut current = Some((start_position, start_direction));
+        let mut path_length = 1;
+
+        while let Some((position, direction)) = current {
+            let valid_directions = [direction, direction.left(), direction.right()];
+            current = valid_directions
+                .into_iter()
+                .filter_map(|next_direction| {
+                    position
+                        .direction_checked(next_direction, &map.bounds)
+                        .map(|valid_point| (valid_point, next_direction))
+                })
+                .find_map(|(valid_point, next_direction)| {
+                    if valid_point == map.end {
+                        closed_paths.insert(valid_point);
+                        add_edge(start_node, valid_point, path_length, &mut edges);
+                        None
+                    } else {
+                        match map.tiles[valid_point.y as usize][valid_point.x as usize] {
+                            Tile::Path => {
+                                // Found a path, keep walking
+                                path_length += 1;
+                                Some((valid_point, next_direction))
+                            }
+                            Tile::Forest => {
+                                // Ouch, a tree
+                                None
+                            }
+                            _ => {
+                                closed_paths.insert(start_position);
+                                path_length += 2;
+                                let end_point: Point<u32> = valid_point
+                                    .direction_checked(next_direction, &map.bounds)
+                                    .unwrap();
+
+                                nodes.insert(end_point);
+                                add_edge(start_node, end_point, path_length, &mut edges);
+
+                                [
+                                    next_direction,
+                                    next_direction.left(),
+                                    next_direction.right(),
+                                ]
+                                .into_iter()
+                                .for_each(|start_direction| {
+                                    if let Some(valid_start) =
+                                        end_point.direction_checked(start_direction, &map.bounds)
+                                    {
+                                        if map.tiles[valid_start.y as usize][valid_start.x as usize]
+                                            != Tile::Forest
+                                        {
+                                            if !closed_paths.contains(&end_point) {
+                                                open_paths.push_back((valid_start, start_direction))
+                                            }
+                                        }
+                                    }
+                                });
+
+                                None
+                            }
+                        }
+                    }
+                });
+        }
+    }
+
+    fn find_path(
+        current_node: UPoint,
+        end_node: UPoint,
+        edges: &HashMap<Point<u32>, HashSet<(Point<u32>, u32)>>,
+        visited: &mut HashSet<UPoint>,
+        length: u32,
+    ) -> Option<u32> {
+        visited.insert(current_node);
+        let longest = edges
+            .get(&current_node)
+            .unwrap()
+            .iter()
+            .filter_map(|&(next_node, distance)| {
+                if next_node == end_node {
+                    Some(length + distance)
+                } else if !visited.contains(&next_node) {
+                    find_path(next_node, end_node, edges, visited, length + distance)
+                } else {
+                    None
+                }
+            })
+            .max();
+        visited.remove(&current_node);
+        longest
+    }
+
+    let mut visited = HashSet::new();
+
+    find_path(map.start, map.end, &edges, &mut visited, 0).unwrap()
 }
