@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{ops, str::FromStr};
 
 pub type UPoint = Point<u32>;
 pub type IPoint = Point<i32>;
@@ -300,5 +300,38 @@ where
             parse_value::<_, Self::Err>(values.next())?,
             parse_value::<_, Self::Err>(values.next())?,
         ))
+    }
+}
+
+impl<T> ops::Mul<T> for Point3D<T>
+where
+    T: num_traits::int::PrimInt,
+{
+    type Output = Point3D<T>;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        Point3D::new(self.x.mul(rhs), self.y.mul(rhs), self.z.mul(rhs))
+    }
+}
+
+impl<T> ops::Add<Point3D<T>> for Point3D<T>
+where
+    T: num_traits::int::PrimInt,
+{
+    type Output = Point3D<T>;
+
+    fn add(self, rhs: Point3D<T>) -> Self::Output {
+        Point3D::new(self.x.add(rhs.x), self.y.add(rhs.y), self.z.add(rhs.z))
+    }
+}
+
+impl<T> ops::Sub<Point3D<T>> for Point3D<T>
+where
+    T: num_traits::int::PrimInt,
+{
+    type Output = Point3D<T>;
+
+    fn sub(self, rhs: Point3D<T>) -> Self::Output {
+        Point3D::new(self.x.sub(rhs.x), self.y.sub(rhs.y), self.z.sub(rhs.z))
     }
 }
