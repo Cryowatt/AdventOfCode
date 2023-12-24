@@ -3,7 +3,17 @@ use advent::*;
 advent_day!(Day24, parse, HeisenbergCompensator, part1, part2);
 
 pub fn parse(input: &str) -> HeisenbergCompensator {
-    HeisenbergCompensator {}
+    input.lines().map(|line| {let (position, velocity) = line.split_once("@").unwrap();
+    
+    let position = {
+        let position_values = position.split_terminator(", ");
+
+        Point3D::new(position_values.next().unwrap().parse().unwrap(), position_values.next().unwrap().parse().unwrap(), position_values.next().unwrap().parse().unwrap())
+    };
+})
+    HeisenbergCompensator {
+
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 pub type UPoint = Point<u32>;
 pub type IPoint = Point<i32>;
 
@@ -238,4 +240,46 @@ macro_rules! advent_bench {
             }
         }
     };
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub struct Point3D<T> {
+    pub x: T,
+    pub y: T,
+    pub z: T,
+}
+
+impl<T> Point3D<T> {
+    pub fn new(x: T, y: T, z: T) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl<T> Point3D<T>
+where
+    T: num_traits::identities::Zero + Copy,
+{
+    pub fn origin() -> Self {
+        Self {
+            x: T::zero(),
+            y: T::zero(),
+            z: T::zero(),
+        }
+    }
+}
+
+impl<T> FromStr for Point3D<T>
+where
+    T: FromStr,
+{
+    type Err = T::Err;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut values = s.split_terminator(", ");
+        Ok(Point3D::new(
+            values.next().ok_or(T::Err)?.parse::<T>()?,
+            values.next()?.parse::<T>()?,
+            values.next()?.parse::<T>()?,
+        ))
+    }
 }
