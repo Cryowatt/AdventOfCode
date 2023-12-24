@@ -268,18 +268,37 @@ where
     }
 }
 
+#[derive(Debug)]
+pub enum PointParseError<Err> {
+    Terminator,
+    InnerValueError(Err),
+}
+
 impl<T> FromStr for Point3D<T>
 where
     T: FromStr,
 {
-    type Err = T::Err;
+    type Err = PointParseError<T::Err>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+        fn parse_value<T, TErr>(
+            value: Option<&str>,
+        ) -> Result<T, PointParseError<<T as FromStr>::Err>>
+        where
+            T: FromStr,
+        {
+            value
+                .ok_or(PointParseError::Terminator)?
+                .trim()
+                .parse::<T>()
+                .map_err(|inner| PointParseError::InnerValueError(inner))
+        }
+
         let mut values = s.split_terminator(", ");
         Ok(Point3D::new(
-            values.next().ok_or(T::Err)?.parse::<T>()?,
-            values.next()?.parse::<T>()?,
-            values.next()?.parse::<T>()?,
+            parse_value::<_, Self::Err>(values.next())?,
+            parse_value::<_, Self::Err>(values.next())?,
+            parse_value::<_, Self::Err>(values.next())?,
         ))
     }
 }
