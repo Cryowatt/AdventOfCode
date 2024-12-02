@@ -7,6 +7,7 @@
 // #![feature(iter_from_coroutine)]
 // #![feature(iter_map_windows)]
 // #![feature(lazy_cell)]
+#![feature(map_try_insert)]
 // #![feature(new_uninit)]
 #![feature(test)]
 
