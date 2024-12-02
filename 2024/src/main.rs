@@ -7,7 +7,7 @@ fn main() {
     println!("AdventOfCode 2023");
 
     run_day!(1, day01::Day01);
-    // run_day!(2, day02::Day02);
+    run_day!(2, day02::Day02);
     // run_day!(3, day03::Day03);
     // run_day!(4, day04::Day04);
     // run_day!(5, day05::Day05);
@@ -30,4 +30,5 @@ fn main() {
     // run_day!(22, day22::Day22);
     // run_day!(23, day23::Day23);
     // run_day!(24, day24::Day24);
+    // run_day!(25, day25::Day25);
 }
