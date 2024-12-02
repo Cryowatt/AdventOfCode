@@ -1,4 +1,7 @@
 use advent::*;
+use nalgebra::*;
+// use ndarray::prelude::*;
+// use ndarray_linalg::Solve;
 use num::complex::ComplexFloat;
 use rayon::iter::{
     IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator, ParallelIterator,
@@ -81,58 +84,134 @@ pub fn snow_collisions(storm: &Vec<HeisenbergCompensator>, min: f64, max: f64) -
 /// 20, 19, 15 @  1, -5, -3");
 /// //assert_eq!(47, part2(&input));
 /// ```
-pub fn part2(storm: &Vec<HeisenbergCompensator>) -> u32 {
-    // Collection of all points by t, then for each hail
-    let mut time_points = vec![];
-    for _t in 0..=storm.len() {
-        time_points.push(vec![]);
-    }
+pub fn part2(storm: &Vec<HeisenbergCompensator>) -> f64 {
+    let p0 = &storm[0].position;
+    let p1 = &storm[1].position;
+    let p2 = &storm[2].position;
+    let v0 = &storm[0].velocity;
+    let v1 = &storm[1].velocity;
+    let v2 = &storm[2].velocity;
 
-    for hail in storm {
-        // let mut points = vec![];
-        for t in 1..=storm.len() {
-            time_points[t as usize].push(hail.position + (hail.velocity * t as i64));
-        }
-        // hail_lines.push(points);
-    }
+    let b = [
+        (p0.y as f64 * v0.x as f64 - p1.y as f64 * v1.x as f64)
+            - (p0.x as f64 * v0.y as f64 - p1.x as f64 * v1.y as f64),
+        (p0.y as f64 * v0.x as f64 - p2.y as f64 * v2.x as f64)
+            - (p0.x as f64 * v0.y as f64 - p2.x as f64 * v2.y as f64),
+        (p0.z as f64 * v0.x as f64 - p1.z as f64 * v1.x as f64)
+            - (p0.x as f64 * v0.z as f64 - p1.x as f64 * v1.z as f64),
+        (p0.z as f64 * v0.x as f64 - p2.z as f64 * v2.x as f64)
+            - (p0.x as f64 * v0.z as f64 - p2.x as f64 * v2.z as f64),
+        (p0.z as f64 * v0.y as f64 - p1.z as f64 * v1.y as f64)
+            - (p0.y as f64 * v0.z as f64 - p1.y as f64 * v1.z as f64),
+        (p0.z as f64 * v0.y as f64 - p2.z as f64 * v2.y as f64)
+            - (p0.y as f64 * v0.z as f64 - p2.y as f64 * v2.z as f64),
+    ];
 
-    // For all t1 points, find velocity to all t2 points, validate with t3 and remainder
-    for (idx1, &t1) in time_points[1].iter().enumerate() {
-        let x1 = t1.x as f64;
-        let y1 = t1.y as f64;
-        let z1 = t1.z as f64;
+    let a = matrix![
+            v1.y as f64 - v0.y as f64,
+            v0.x as f64 - v1.x as f64,
+            0.0f64,
+            p0.y as f64 - p1.y as f64,
+            p1.x as f64 - p0.x as f64,
+            0.0f64
+        ;
+            v2.y as f64 - v0.y as f64,
+            v0.x as f64 - v2.x as f64,
+            0.0f64,
+            p0.y as f64 - p2.y as f64,
+            p2.x as f64 - p0.x as f64,
+            0.0f64
+        ;
 
-        for (idx2, &t2) in time_points[2]
-            .iter()
-            .enumerate()
-            .filter(|(id, _)| *id != idx1)
-        {
-            let x2 = t2.x as f64;
-            let y2 = t2.y as f64;
-            let z2 = t2.z as f64;
+            v1.z as f64 - v0.z as f64,
+            0.0f64,
+            v0.x as f64 - v1.x as f64,
+            p0.z as f64 - p1.z as f64,
+            0.0f64,
+            p1.x as f64 - p0.x as f64
+        ;
 
-            for (idx3, &t3) in time_points[3]
-                .iter()
-                .enumerate()
-                .filter(|(id, _)| *id != idx1 && *id != idx2)
-            {
-                let x3 = t3.x as f64;
-                let y3 = t3.y as f64;
-                let z3 = t3.z as f64;
+            v2.z as f64 - v0.z as f64,
+            0.0f64,
+            v0.x as f64 - v2.x as f64,
+            p0.z as f64 - p2.z as f64,
+            0.0f64,
+            p2.x as f64 - p0.x as f64
+        ;
 
-                // // x2(y3 – y2) + x1(y2 – y3) + x2(y2 – y1) – x3(y2 – y1) = 0
-                let colinear_check =
-                    x2 * (y3 - y2) + x1 * (y2 - y3) + x2 * (y2 - y1) - x3 * (y2 - y1);
-                if colinear_check.abs() < 100f64 {
-                    println!("COLINEAR!");
-                } else {
-                    println!("{colinear_check}");
-                }
-            }
-            // let t3 = t2 + (t2 - t1);
-            // let fk = time_points[3].iter().find(|&&p| p == t3);
-            // println!("{:?} {:?} {:?} {:?} {:?}", t1, t2, t2 - t1, t3, fk);
-        }
-    }
-    0
+            0.0f64,
+            v1.z as f64 - v0.z as f64,
+            v0.y as f64 - v1.y as f64,
+            0.0f64,
+            p0.z as f64 - p1.z as f64,
+            p1.y as f64 - p0.y as f64
+        ;
+
+            0.0f64,
+            v2.z as f64 - v0.z as f64,
+            v0.y as f64 - v2.y as f64,
+            0.0f64,
+            p0.z as f64 - p2.z as f64,
+            p2.y as f64 - p0.y as f64
+
+    ];
+
+    let r = a.lu().solve_mu(&b).unwrap();
+    // println!("r: {:?}", r);
+    println!("p2: {:?}", r[0] + r[1] + r[2]);
+    r[0] + r[1] + r[2]
+
+    // // Collection of all points by t, then for each hail
+    // let mut time_points = vec![];
+    // for _t in 0..=storm.len() {
+    //     time_points.push(vec![]);
+    // }
+
+    // for hail in storm {
+    //     // let mut points = vec![];
+    //     for t in 1..=storm.len() {
+    //         time_points[t as usize].push(hail.position + (hail.velocity * t as i64));
+    //     }
+    //     // hail_lines.push(points);
+    // }
+
+    // // For all t1 points, find velocity to all t2 points, validate with t3 and remainder
+    // for (idx1, &t1) in time_points[1].iter().enumerate() {
+    //     let x1 = t1.x as f64;
+    //     let y1 = t1.y as f64;
+    //     let z1 = t1.z as f64;
+
+    //     for (idx2, &t2) in time_points[2]
+    //         .iter()
+    //         .enumerate()
+    //         .filter(|(id, _)| *id != idx1)
+    //     {
+    //         let x2 = t2.x as f64;
+    //         let y2 = t2.y as f64;
+    //         let z2 = t2.z as f64;
+
+    //         for (idx3, &t3) in time_points[3]
+    //             .iter()
+    //             .enumerate()
+    //             .filter(|(id, _)| *id != idx1 && *id != idx2)
+    //         {
+    //             let x3 = t3.x as f64;
+    //             let y3 = t3.y as f64;
+    //             let z3 = t3.z as f64;
+
+    //             // // x2(y3 – y2) + x1(y2 – y3) + x2(y2 – y1) – x3(y2 – y1) = 0
+    //             let colinear_check =
+    //                 x2 * (y3 - y2) + x1 * (y2 - y3) + x2 * (y2 - y1) - x3 * (y2 - y1);
+    //             if colinear_check.abs() < 100f64 {
+    //                 println!("COLINEAR!");
+    //             } else {
+    //                 println!("{colinear_check}");
+    //             }
+    //         }
+    //         // let t3 = t2 + (t2 - t1);
+    //         // let fk = time_points[3].iter().find(|&&p| p == t3);
+    //         // println!("{:?} {:?} {:?} {:?} {:?}", t1, t2, t2 - t1, t3, fk);
+    //     }
+    // }
+    // 0
 }
