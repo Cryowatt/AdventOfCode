@@ -25,23 +25,22 @@ pub fn parse(input: &str) -> Vec<Vec<i32>> {
 /// assert_eq!(2, part1(&input));
 /// ```
 pub fn part1(input: &Vec<Vec<i32>>) -> usize {
-    input
-        .iter()
-        .filter(|row| {
-            let count = row.len() - 1;
-            let score: i32 = row
-                .windows(2)
-                .map(|x| x[0] - x[1])
-                .map(|pair| match pair {
-                    -3..=-1 => -1,
-                    1..=3 => 1,
-                    _ => 0,
-                })
-                .sum();
+    input.iter().filter(|&row| is_safe(row.iter())).count()
+}
 
-            score.abs() == count as i32
+fn is_safe<'a, T: Iterator<Item = &'a i32>>(input: T) -> bool {
+    input
+        .map_windows(|[&x, &y]| match x - y {
+            -3..=-1 => -1,
+            1..=3 => 1,
+            _ => 0,
         })
-        .count()
+        .scan((0i32, 0i32), |state, x| {
+            state.0 += 1;
+            state.1 += x;
+            Some((state.0, state.1))
+        })
+        .all(|(count, score)| score.abs() == count)
 }
 
 /// ```rust
@@ -53,8 +52,14 @@ pub fn part1(input: &Vec<Vec<i32>>) -> usize {
 /// 1 3 2 4 5
 /// 8 6 4 4 1
 /// 1 3 6 7 9");
-/// assert_eq!(0, part2(&input));
+/// assert_eq!(4, part2(&input));
 /// ```
-pub fn part2(input: &Vec<Vec<i32>>) -> i32 {
-    0
+pub fn part2(input: &Vec<Vec<i32>>) -> usize {
+    input
+        .iter()
+        .filter(|&row| {
+            is_safe(row.iter())
+                || (0..row.len()).any(|i| is_safe(row.iter().take(i).chain(row.iter().skip(i + 1))))
+        })
+        .count()
 }
