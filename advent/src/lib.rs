@@ -9,6 +9,17 @@ pub struct Point<T> {
     pub y: T,
 }
 
+impl<T> ops::Add<Point<T>> for Point<T>
+where
+    T: num_traits::identities::Zero + Copy,
+{
+    type Output = Point<T>;
+
+    fn add(self, rhs: Point<T>) -> Self::Output {
+        Point::new((self.x + rhs.x) as T, (self.y + rhs.y) as T)
+    }
+}
+
 impl<T> Point<T>
 where
     T: num_traits::Unsigned
@@ -59,7 +70,7 @@ impl<T> Point<T>
 where
     T: num_traits::identities::Zero + Copy,
 {
-    pub fn new(x: T, y: T) -> Self {
+    pub const fn new(x: T, y: T) -> Self {
         Self { x, y }
     }
 
