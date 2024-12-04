@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use advent::*;
 use num::Integer;
 
-advent_day!(Day08, parse, WastelandMap, part1, part2);
+advent_day!(Day08, parse, WastelandMap<'a>, part1, part2);
 advent_bench!(parse, cursed_hashmap, part1_hashmap, part2_hashmap);
 
 pub fn parse(input: &str) -> WastelandMap {

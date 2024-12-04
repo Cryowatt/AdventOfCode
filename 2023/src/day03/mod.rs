@@ -1,6 +1,6 @@
 use advent::*;
 
-advent_day!(Day03, parse, Grid<'_>, part1, part2);
+advent_day!(Day03, parse, Grid<'a>, part1, part2);
 
 pub fn parse<'a>(input: &'a str) -> Grid<'a> {
     let width = input.find(['\r', '\n']).unwrap();

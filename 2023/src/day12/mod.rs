@@ -1,7 +1,7 @@
 use advent::*;
 use rayon::prelude::*;
 
-advent_day!(Day12, parse, Vec<SpringRecord>, part1, part2);
+advent_day!(Day12, parse, Vec<SpringRecord<'a>>, part1, part2);
 
 pub fn parse(input: &str) -> Vec<SpringRecord> {
     input

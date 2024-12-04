@@ -6,7 +6,7 @@ use std::{
 
 use advent::*;
 
-advent_day!(Day11, parse, PipeMap, part1, part2);
+advent_day!(Day11, parse, GalaxyMap, part1, part2);
 
 pub fn parse(input: &str) -> GalaxyMap {
     let galaxy = input

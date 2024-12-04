@@ -170,7 +170,7 @@ macro_rules! run_day {
 macro_rules! advent_day {
     ($day:ident, $parser:expr, $input_type:ty, $part1_func:ident, $part2_func:ident) => {
         pub const INPUT: &'static str = include_str!("input.txt");
-        // type InputType = $input_type;
+        type InputType<'a> = $input_type;
 
         pub struct $day;
 

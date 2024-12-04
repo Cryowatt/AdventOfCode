@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use advent::*;
 
-advent_day!(Day07, parse, Vec<CamelHand>, part1, part2);
+advent_day!(Day07, parse, Vec<CamelHand<'a>>, part1, part2);
 
 pub struct CamelHand<'a> {
     cards: &'a str,

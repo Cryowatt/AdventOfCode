@@ -4,7 +4,7 @@ use advent::*;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use regex::Regex;
 
-advent_day!(Day19, parse, PartsSystem, part1, part2);
+advent_day!(Day19, parse, PartsSystem<'a>, part1, part2);
 
 pub struct PartsSystem<'a> {
     workflows: HashMap<&'a str, Workflow<'a>>,
