@@ -3,7 +3,7 @@ use std::{cmp::Ordering, sync::OnceLock};
 use advent::*;
 use log::debug;
 
-advent_day!(Day01, parse, Vec<&str>, part1, part2);
+advent_day!(Day01, parse, Vec<&'static str>, part1, part2);
 advent_bench!(parse, cursed_regex, part2_regex);
 
 pub fn parse(input: &str) -> Vec<&str> {

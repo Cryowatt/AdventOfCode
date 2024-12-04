@@ -1,6 +1,6 @@
 use advent::*;
 
-advent_day!(Day01, parse, &str, part1, part2);
+advent_day!(Day01, parse, str, part1, part2);
 
 pub fn parse(input: &str) -> &str {
     input

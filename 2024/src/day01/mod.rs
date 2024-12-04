@@ -7,7 +7,7 @@ use advent::*;
 
 advent_day!(Day01, parse, Vec<(i32, i32)>, part1, part2);
 
-pub fn parse(input: &str) -> Vec<(i32, i32)> {
+pub fn parse(input: &str) -> InputType {
     input
         .lines()
         .map(|line| {
@@ -31,7 +31,7 @@ pub fn parse(input: &str) -> Vec<(i32, i32)> {
 /// 3   3");
 /// assert_eq!(11, part1(&input));
 /// ```
-pub fn part1(input: &Vec<(i32, i32)>) -> i32 {
+pub fn part1(input: &InputType) -> i32 {
     let mut left_heap = BinaryHeap::with_capacity(1000);
     let mut right_heap = BinaryHeap::with_capacity(1000);
 
@@ -58,7 +58,7 @@ pub fn part1(input: &Vec<(i32, i32)>) -> i32 {
 /// 3   3");
 /// assert_eq!(31, part2(&input));
 /// ```
-pub fn part2(input: &Vec<(i32, i32)>) -> i32 {
+pub fn part2(input: &InputType) -> i32 {
     let mut counts = HashMap::new();
     for key in input.iter().map(|item| item.1) {
         if let Err(mut entry) = counts.try_insert(key, 1) {

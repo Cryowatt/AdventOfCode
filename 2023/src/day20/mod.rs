@@ -8,7 +8,7 @@ use advent::*;
 use num::Integer;
 use regex::Regex;
 
-advent_day!(Day20, parse, Vec<ModuleDefinition>, part1, part2);
+advent_day!(Day20, parse, Vec<ModuleDefinition<'a>>, part1, part2);
 
 pub fn parse(input: &str) -> Vec<ModuleDefinition> {
     let module_pattern =

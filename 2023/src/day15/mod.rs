@@ -2,7 +2,7 @@ use std::{mem::MaybeUninit, str::Bytes};
 
 use advent::*;
 
-advent_day!(Day15, parse, Initialization, part1, part2);
+advent_day!(Day15, parse, Initialization<'a>, part1, part2);
 
 pub fn parse(input: &str) -> Initialization {
     Initialization {

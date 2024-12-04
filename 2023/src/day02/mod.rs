@@ -2,7 +2,7 @@ use std::sync::OnceLock;
 
 use advent::*;
 
-advent_day!(Day02, parse, Vec<&str>, part1, part2);
+advent_day!(Day02, parse, Vec<&'static str>, part1, part2);
 
 pub fn parse(input: &str) -> Vec<&str> {
     input.lines().collect()

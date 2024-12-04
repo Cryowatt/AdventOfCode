@@ -2,7 +2,7 @@ use advent::*;
 
 advent_day!(Day02, parse, Vec<Vec<i32>>, part1, part2);
 
-pub fn parse(input: &str) -> Vec<Vec<i32>> {
+pub fn parse(input: &str) -> InputType {
     input
         .lines()
         .map(|line| {
@@ -24,7 +24,7 @@ pub fn parse(input: &str) -> Vec<Vec<i32>> {
 /// 1 3 6 7 9");
 /// assert_eq!(2, part1(&input));
 /// ```
-pub fn part1(input: &Vec<Vec<i32>>) -> usize {
+pub fn part1(input: &InputType) -> usize {
     input.iter().filter(|&row| is_safe(row.iter())).count()
 }
 
@@ -54,7 +54,7 @@ fn is_safe<'a, T: Iterator<Item = &'a i32>>(input: T) -> bool {
 /// 1 3 6 7 9");
 /// assert_eq!(4, part2(&input));
 /// ```
-pub fn part2(input: &Vec<Vec<i32>>) -> usize {
+pub fn part2(input: &InputType) -> usize {
     input
         .iter()
         .filter(|&row| {

@@ -2,9 +2,9 @@ use regex::Regex;
 
 use advent::*;
 
-advent_day!(Day03, parse, Vec<Vec<i32>>, part1, part2);
+advent_day!(Day03, parse, str, part1, part2);
 
-pub fn parse(input: &str) -> &str {
+pub fn parse(input: &str) -> &InputType {
     input
 }
 
@@ -14,7 +14,7 @@ pub fn parse(input: &str) -> &str {
 /// r"xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))");
 /// assert_eq!(161, part1(&input));
 /// ```
-pub fn part1(input: &str) -> i32 {
+pub fn part1(input: &InputType) -> i32 {
     let pattern = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").unwrap();
 
     pattern
@@ -32,7 +32,7 @@ pub fn part1(input: &str) -> i32 {
 /// r"xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))");
 /// assert_eq!(48, part2(&input));
 /// ```
-pub fn part2(input: &str) -> i32 {
+pub fn part2(input: &InputType) -> i32 {
     let pattern = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)|(do)\(\)|(don't)\(\)").unwrap();
 
     pattern
