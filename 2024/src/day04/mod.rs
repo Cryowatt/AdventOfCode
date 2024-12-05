@@ -1,5 +1,4 @@
 use advent::*;
-use nalgebra::point;
 
 advent_day!(Day04, parse, Vec<Vec<u8>>, part1, part2);
 
