@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use advent::*;
 
 advent_day!(Day05, parse, (Vec<(u8, u8)>, Vec<Vec<u8>>), part1, part2);
@@ -6,10 +8,12 @@ pub fn parse(input: &str) -> InputType {
     let rules = input
         .lines()
         .map_while(|line| {
-            line.split_once('|')
-                .map(|(left, right)| (left.parse().unwrap(), right.parse().unwrap()))
+            line.split_once('|').map(|(first, second)| {
+                (first.parse::<u8>().unwrap(), second.parse::<u8>().unwrap())
+            })
         })
         .collect();
+
     let page_updates = input
         .lines()
         .skip_while(|line| !line.contains(','))
@@ -57,23 +61,17 @@ pub fn parse(input: &str) -> InputType {
 /// assert_eq!(143, part1(&input));
 /// ```
 pub fn part1(input: &InputType) -> u32 {
-    let (rules, page_updates) = input;
+    let (order, page_updates) = input;
     page_updates
         .iter()
-        .filter(|&pages| {
-            rules.iter().all(|&(first, second)| {
-                if let Some(first_index) = pages.iter().position(|&page| page == first) {
-                    if let Some(second_index) = pages.iter().position(|&page| page == second) {
-                        first_index < second_index
-                    } else {
-                        true
-                    }
-                } else {
-                    true
-                }
-            })
+        .filter_map(|pages| {
+            let ranks = rank(order, pages);
+            if pages.is_sorted_by_key(|key| ranks.get(key).cloned().unwrap_or_default()) {
+                Some(pages[pages.len() / 2] as u32)
+            } else {
+                None
+            }
         })
-        .map(|valid_line| valid_line[valid_line.len() / 2] as u32)
         .sum()
 }
 
@@ -108,8 +106,32 @@ pub fn part1(input: &InputType) -> u32 {
 /// 75,97,47,61,53
 /// 61,13,29
 /// 97,13,75,29,47");
-/// assert_eq!(0, part2(&input));
+/// assert_eq!(123, part2(&input));
 /// ```
-pub fn part2(input: &InputType) -> usize {
-    0
+pub fn part2(input: &InputType) -> u32 {
+    let (order, page_updates) = input;
+    page_updates
+        .iter()
+        .filter_map(|pages| {
+            let ranks = &rank(order, pages);
+            if !pages.is_sorted_by_key(|key| ranks.get(key).map_or(0, |v| *v)) {
+                let mut pages = pages.clone();
+                pages.sort_by_key(|key| ranks.get(key).map_or(0, |v| *v));
+                Some(pages[pages.len() / 2] as u32)
+            } else {
+                None
+            }
+        })
+        .sum()
+}
+
+fn rank(rules: &Vec<(u8, u8)>, pages: &Vec<u8>) -> HashMap<u8, u8> {
+    rules
+        .iter()
+        .filter(|&rule| pages.contains(&rule.0) && pages.contains(&rule.1))
+        .fold(HashMap::new(), |mut map, rule| {
+            let entry = map.entry(rule.1).or_default();
+            *entry += 1;
+            map
+        })
 }
