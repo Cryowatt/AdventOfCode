@@ -12,13 +12,14 @@ name = "day"
 [dependencies]
 advent = { path = "../advent" }
 bitflags = "2.4"
-crossterm = "0.27"
+crossterm = "0.28"
 ctor = "0.2"
-env_logger = "0.10"
+env_logger = "0.11"
 log = "0.4"
-nalgebra = "0.32"
+nalgebra = "0.33"
 # ndarray = "0.15"
 # ndarray-linalg = "0.16"
+tokio = { version = "1.42", features = ["full"] }
 num = "0.4"
 onig = { version = "6.4.0", default-features = false }
 rayon = "1.8"

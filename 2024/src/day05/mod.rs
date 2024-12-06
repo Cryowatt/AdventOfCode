@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::collections::HashMap;
 
 use advent::*;
@@ -63,7 +64,7 @@ pub fn parse(input: &str) -> InputType {
 pub fn part1(input: &InputType) -> u32 {
     let (order, page_updates) = input;
     page_updates
-        .iter()
+        .par_iter()
         .filter_map(|pages| {
             let ranks = rank(order, pages);
             if pages.is_sorted_by_key(|key| ranks.get(key).cloned().unwrap_or_default()) {
@@ -111,7 +112,7 @@ pub fn part1(input: &InputType) -> u32 {
 pub fn part2(input: &InputType) -> u32 {
     let (order, page_updates) = input;
     page_updates
-        .iter()
+        .par_iter()
         .filter_map(|pages| {
             let ranks = &rank(order, pages);
             if !pages.is_sorted_by_key(|key| ranks.get(key).map_or(0, |v| *v)) {
