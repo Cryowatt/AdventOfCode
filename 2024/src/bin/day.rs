@@ -30,9 +30,9 @@ fn main() {
         6 => {
             run_day!(6, day06::Day06);
         }
-        // 7 => {
-        //     run_day!(7, day07::Day07);
-        // }
+        7 => {
+            run_day!(7, day07::Day07);
+        }
         // 8 => {
         //     run_day!(8, day08::Day08);
         // }
@@ -83,6 +83,9 @@ fn main() {
         // }
         // 24 => {
         //     run_day!(24, day24::Day24);
+        // }
+        // 25 => {
+        //     run_day!(25, day25::Day25);
         // }
         _ => unimplemented!(),
     }
