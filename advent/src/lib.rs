@@ -11,12 +11,23 @@ pub struct Point<T> {
 
 impl<T> ops::Add<Point<T>> for Point<T>
 where
-    T: num_traits::identities::Zero + Copy,
+    T: num_traits::identities::Zero + Copy + num_traits::CheckedAdd,
 {
     type Output = Point<T>;
 
     fn add(self, rhs: Point<T>) -> Self::Output {
         Point::new((self.x + rhs.x) as T, (self.y + rhs.y) as T)
+    }
+}
+
+impl<T> ops::Sub<Point<T>> for Point<T>
+where
+    T: num_traits::identities::Zero + Copy + num_traits::CheckedSub,
+{
+    type Output = Point<T>;
+
+    fn sub(self, rhs: Point<T>) -> Self::Output {
+        Point::new((self.x - rhs.x) as T, (self.y - rhs.y) as T)
     }
 }
 
