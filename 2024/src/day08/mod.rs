@@ -54,14 +54,6 @@ pub fn part1(input: &InputType) -> usize {
             .or_insert_with(|| vec![node]);
     }
 
-    fn add_node(nodes: &mut HashSet<Point<i32>>, node: Point<i32>, bounds: Point<i32>) -> bool {
-        if node.x >= 0 && node.y >= 0 && node.x < bounds.x && node.y < bounds.y {
-            nodes.insert(node)
-        } else {
-            false
-        }
-    }
-
     antinodes.len()
 }
 
@@ -80,8 +72,55 @@ pub fn part1(input: &InputType) -> usize {
 /// .........A..
 /// ............
 /// ............");
-/// assert_eq!(0, part2(&input));
+/// assert_eq!(34, part2(&input));
 /// ```
 pub fn part2(input: &InputType) -> usize {
-    0
+    let bounds = Point::new(input.first().unwrap().len() as i32, input.len() as i32);
+    let mut antinodes = HashSet::new();
+    let mut frequency_antenna = HashMap::new();
+    for (f, node) in input.iter().enumerate().flat_map(|(y, row)| {
+        row.iter().enumerate().filter_map(move |(x, cell)| {
+            if *cell == b'.' {
+                None
+            } else {
+                Some((*cell, Point::new(x as i32, y as i32)))
+            }
+        })
+    }) {
+        frequency_antenna
+            .entry(f)
+            .and_modify(|peers: &mut Vec<Point<i32>>| {
+                for &peer in peers.iter() {
+                    add_node(&mut antinodes, node, bounds);
+                    add_node(&mut antinodes, peer, bounds);
+                    let distance = node - peer;
+                    let mut harmonic = node + distance;
+                    while in_bounds(&harmonic, &bounds) {
+                        add_node(&mut antinodes, harmonic, bounds);
+                        harmonic = harmonic + distance;
+                    }
+                    let mut harmonic = peer - distance;
+                    while in_bounds(&harmonic, &bounds) {
+                        add_node(&mut antinodes, harmonic, bounds);
+                        harmonic = harmonic - distance;
+                    }
+                }
+                peers.push(node);
+            })
+            .or_insert_with(|| vec![node]);
+    }
+
+    fn in_bounds(node: &Point<i32>, bounds: &Point<i32>) -> bool {
+        node.x >= 0 && node.y >= 0 && node.x < bounds.x && node.y < bounds.y
+    }
+
+    antinodes.len()
+}
+
+fn add_node(nodes: &mut HashSet<Point<i32>>, node: Point<i32>, bounds: Point<i32>) -> bool {
+    if node.x >= 0 && node.y >= 0 && node.x < bounds.x && node.y < bounds.y {
+        nodes.insert(node)
+    } else {
+        false
+    }
 }
