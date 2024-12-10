@@ -5,6 +5,7 @@ use std::{
 };
 
 use advent::*;
+use rayon::prelude::*;
 
 advent_day!(Day10, parse, Vec<Vec<u8>>, part1, part2);
 
@@ -30,40 +31,15 @@ pub fn parse(input: &str) -> InputType {
 /// ```
 pub fn part1(input: &InputType) -> u32 {
     let bounds = UPoint::new(input.first().unwrap().len() as u32, input.len() as u32);
-    let end_nodes = input.iter().enumerate().flat_map(|(y, row)| {
-        row.iter().enumerate().filter_map(move |(x, &cell)| {
-            if cell == 0 {
-                Some(UPoint::new(x as u32, y as u32))
-            } else {
-                None
-            }
-        })
-    });
-    let start_nodes: HashMap<UPoint, AtomicU32> =
-        HashMap::from_iter(input.iter().enumerate().flat_map(|(y, row)| {
-            row.iter().enumerate().filter_map(move |(x, &cell)| {
-                if cell == 9 {
-                    Some((UPoint::new(x as u32, y as u32), AtomicU32::new(0)))
-                } else {
-                    None
-                }
-            })
-        }));
 
-    end_nodes.for_each(|node| explore(input, &bounds, node, &start_nodes));
-
-    fn explore(
-        map: &Vec<Vec<u8>>,
-        bounds: &UPoint,
-        end: UPoint,
-        start_nodes: &HashMap<Point<u32>, AtomicU32>,
-    ) {
+    fn explore(map: &Vec<Vec<u8>>, bounds: &UPoint, end: UPoint) -> u32 {
         let mut map = map.clone();
         let mut alive = vec![(end, 0u8)];
+        let mut score = 0;
 
         while let Some((pos, altitude)) = alive.pop() {
             if altitude == 9 {
-                start_nodes[&pos].fetch_add(1, Ordering::Relaxed);
+                score += 1;
             } else {
                 let target_altitude = altitude + 1;
 
@@ -93,11 +69,24 @@ pub fn part1(input: &InputType) -> u32 {
                 }
             }
         }
+
+        score
     }
 
-    start_nodes
+    input
         .iter()
-        .map(|(_, score)| score.load(Ordering::Relaxed))
+        .enumerate()
+        .flat_map(|(y, row)| {
+            row.iter().enumerate().filter_map(move |(x, &cell)| {
+                if cell == 0 {
+                    Some(UPoint::new(x as u32, y as u32))
+                } else {
+                    None
+                }
+            })
+        })
+        .par_bridge()
+        .map(|node| explore(input, &bounds, node))
         .sum()
 }
 
@@ -112,8 +101,60 @@ pub fn part1(input: &InputType) -> u32 {
 /// 32019012
 /// 01329801
 /// 10456732");
-/// assert_eq!(0, part2(&input));
+/// assert_eq!(81, part2(&input));
 /// ```
-pub fn part2(input: &InputType) -> i32 {
-    0
+pub fn part2(input: &InputType) -> u32 {
+    let bounds = UPoint::new(input.first().unwrap().len() as u32, input.len() as u32);
+
+    fn explore(map: &Vec<Vec<u8>>, bounds: &UPoint, end: UPoint) -> u32 {
+        let mut alive = vec![(end, 0u8)];
+        let mut score = 0;
+
+        while let Some((pos, altitude)) = alive.pop() {
+            if altitude == 9 {
+                score += 1;
+            } else {
+                let target_altitude = altitude + 1;
+
+                if let Some(pos) = pos.north_checked() {
+                    if map[pos.y as usize][pos.x as usize] == target_altitude {
+                        alive.push((pos, target_altitude));
+                    }
+                }
+                if let Some(pos) = pos.west_checked() {
+                    if map[pos.y as usize][pos.x as usize] == target_altitude {
+                        alive.push((pos, target_altitude));
+                    }
+                }
+                if let Some(pos) = pos.south_checked(bounds) {
+                    if map[pos.y as usize][pos.x as usize] == target_altitude {
+                        alive.push((pos, target_altitude));
+                    }
+                }
+                if let Some(pos) = pos.east_checked(bounds) {
+                    if map[pos.y as usize][pos.x as usize] == target_altitude {
+                        alive.push((pos, target_altitude));
+                    }
+                }
+            }
+        }
+
+        score
+    }
+
+    input
+        .iter()
+        .enumerate()
+        .flat_map(|(y, row)| {
+            row.iter().enumerate().filter_map(move |(x, &cell)| {
+                if cell == 0 {
+                    Some(UPoint::new(x as u32, y as u32))
+                } else {
+                    None
+                }
+            })
+        })
+        .par_bridge()
+        .map(|node| explore(input, &bounds, node))
+        .sum()
 }
