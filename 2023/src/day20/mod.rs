@@ -57,8 +57,6 @@ pub struct ModuleDefinition<'a> {
     targets: Vec<&'a str>,
 }
 
-trait InputModule: Module {}
-
 trait Module {
     fn connect(&self, module: (Rc<dyn Module>, usize));
     fn pulse(&self, high: bool, context: usize, pulses: &mut VecDeque<Pulse>);
@@ -68,8 +66,6 @@ trait Module {
 struct Button {
     broadcast: Rc<dyn Module>,
 }
-
-impl InputModule for Button {}
 
 impl Module for Button {
     fn connect(&self, _module: (Rc<dyn Module>, usize)) {
@@ -105,8 +101,6 @@ impl Broadcast {
         }
     }
 }
-
-impl InputModule for Broadcast {}
 
 impl Module for Broadcast {
     fn connect(&self, module: (Rc<dyn Module>, usize)) {
@@ -156,8 +150,6 @@ impl Conjunction {
     }
 }
 
-impl InputModule for Conjunction {}
-
 impl Module for Conjunction {
     fn connect(&self, module: (Rc<dyn Module>, usize)) {
         self.targets.borrow_mut().push(module);
@@ -197,8 +189,6 @@ impl FlipFlop {
     }
 }
 
-impl InputModule for FlipFlop {}
-
 impl Module for FlipFlop {
     fn connect(&self, module: (Rc<dyn Module>, usize)) {
         self.targets.borrow_mut().push(module);
@@ -227,8 +217,6 @@ impl NullModule {
         Self {}
     }
 }
-
-impl InputModule for NullModule {}
 
 impl Module for NullModule {
     fn connect(&self, _module: (Rc<dyn Module>, usize)) {
