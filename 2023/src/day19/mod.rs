@@ -50,7 +50,7 @@ struct Rule<'a> {
 }
 
 impl<'a> Rule<'a> {
-    fn apply(&'a self, part: &MachinePart) -> Option<&Target<'a>> {
+    fn apply(&'a self, part: &MachinePart) -> Option<&'a Target<'a>> {
         let value = match self.category {
             Category::X => part.x,
             Category::M => part.m,
