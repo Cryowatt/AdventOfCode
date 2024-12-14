@@ -20,6 +20,17 @@ where
     }
 }
 
+impl<T> ops::Mul<T> for Point<T>
+where
+    T: num_traits::identities::Zero + Copy + num_traits::CheckedMul,
+{
+    type Output = Point<T>;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        Point::new((self.x * rhs) as T, (self.y * rhs) as T)
+    }
+}
+
 impl<T> ops::Sub<Point<T>> for Point<T>
 where
     T: num_traits::identities::Zero + Copy + num_traits::CheckedSub,
