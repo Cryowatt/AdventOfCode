@@ -1,4 +1,8 @@
+use core::hash;
+use std::{collections::HashSet, i32};
+
 use advent::*;
+use num::traits::Euclid;
 use regex::Regex;
 
 advent_day!(Day14, parse, Vec<Robot>, part1, part2);
@@ -23,7 +27,7 @@ pub fn parse(input: &str) -> InputType {
         .collect()
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Robot {
     pub position: IPoint,
     pub velocity: IPoint,
@@ -69,10 +73,8 @@ pub fn part1_with_bounds<const WIDTH: i32, const HEIGHT: i32>(input: &InputType)
         .iter()
         .filter_map(|robot| {
             let position = robot.position + robot.velocity * 100;
-            let wrapped_position = IPoint::new(
-                ((position.x % WIDTH) + WIDTH) % WIDTH,
-                ((position.y % HEIGHT) + HEIGHT) % HEIGHT,
-            );
+            let wrapped_position =
+                IPoint::new(position.x.rem_euclid(WIDTH), position.y.rem_euclid(HEIGHT));
             match (
                 wrapped_position.x.cmp(&x_center),
                 wrapped_position.y.cmp(&y_center),
@@ -94,23 +96,45 @@ pub fn part1_with_bounds<const WIDTH: i32, const HEIGHT: i32>(input: &InputType)
     ne_count * nw_count * se_count * sw_count
 }
 
-/// ```rust
-/// use advent_of_code_2024::day14::*;
-/// let input = parse(
-/// r"p=0,4 v=3,-3
-/// p=6,3 v=-1,-3
-/// p=10,3 v=-1,2
-/// p=2,0 v=2,-1
-/// p=0,0 v=1,3
-/// p=3,0 v=-2,-2
-/// p=7,6 v=-1,-3
-/// p=3,0 v=-1,-2
-/// p=9,3 v=2,3
-/// p=7,3 v=-1,2
-/// p=2,4 v=2,-3
-/// p=9,5 v=-3,-3");
-/// assert_eq!(0, part2(&input));
-/// ```
+/// No test cases
 pub fn part2(input: &InputType) -> u32 {
-    0
+    part2_with_bounds::<101, 103, 32>(input)
+}
+
+pub fn part2_with_bounds<const WIDTH: i32, const HEIGHT: i32, const TREE_RUN: i32>(
+    input: &InputType,
+) -> u32 {
+    let mut robots = input.to_owned();
+
+    fn update<const WIDTH: i32, const HEIGHT: i32>(robots: &mut Vec<Robot>) {
+        robots.iter_mut().for_each(|robot| {
+            robot.position.x = (robot.position.x + robot.velocity.x).rem_euclid(WIDTH);
+            robot.position.y = (robot.position.y + robot.velocity.y).rem_euclid(HEIGHT);
+        });
+    }
+
+    fn run_length<const WIDTH: i32, const HEIGHT: i32>(robots: &Vec<Robot>) -> u32 {
+        let mut max_run = 0;
+        let robo_positions: HashSet<Point<i32>> =
+            HashSet::from_iter(robots.iter().map(|robot| robot.position));
+        for y in 0..HEIGHT {
+            let mut run_length = 0;
+            for x in 0..WIDTH {
+                if robo_positions.contains(&IPoint::new(x, y)) {
+                    run_length += 1;
+                } else {
+                    max_run = max_run.max(run_length);
+                    run_length = 0;
+                }
+            }
+        }
+        max_run
+    }
+    let mut frame = 0;
+
+    while run_length::<WIDTH, HEIGHT>(&robots) < 31 {
+        frame += 1;
+        update::<WIDTH, HEIGHT>(&mut robots);
+    }
+    frame
 }
