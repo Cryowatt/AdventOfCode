@@ -54,9 +54,9 @@ fn main() {
         14 => {
             run_day!(14, day14::Day14);
         }
-        // 15 => {
-        //     run_day!(15, day15::Day15);
-        // }
+        15 => {
+            run_day!(15, day15::Day15);
+        }
         // 16 => {
         //     run_day!(16, day16::Day16);
         // }
