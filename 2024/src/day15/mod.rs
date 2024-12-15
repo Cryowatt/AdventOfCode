@@ -1,9 +1,5 @@
-use std::process::Command;
-
 use advent::*;
 use array2d::Array2D;
-use onig::EncodedChars;
-use rayon::iter::Positions;
 
 advent_day!(Day15, parse, Warehouse, part1, part2);
 
@@ -15,10 +11,12 @@ pub struct Warehouse {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Tile {
-    Wall,
-    Robot,
-    Empty,
     Box,
+    BoxL,
+    BoxR,
+    Robot,
+    Wall,
+    Empty,
 }
 
 pub fn parse(input: &str) -> InputType {
@@ -97,34 +95,12 @@ pub fn part1(input: &InputType) -> usize {
     let ((row, col), _) = input
         .floorplan
         .enumerate_row_major()
-        .find(|((row, col), &tile)| tile == Tile::Robot)
+        .find(|(_, &tile)| tile == Tile::Robot)
         .unwrap();
     let mut robot = UPoint::new(col as u32, row as u32);
-    println!("Robot at {:?}", robot);
     let mut warehouse = input.floorplan.clone();
+    warehouse[(robot.y as usize, robot.x as usize)] = Tile::Empty;
     let bounds = UPoint::new(warehouse.column_len() as u32, warehouse.row_len() as u32);
-
-    for command in input.moveset.iter() {
-        if let Ok(position) = push_tile(&mut warehouse, &bounds, robot, *command) {
-            robot = position;
-        }
-        print_warehouse(&warehouse);
-    }
-
-    fn print_warehouse(warehouse: &Array2D<Tile>) {
-        for row in warehouse.as_rows() {
-            for tile in row {
-                let c = match tile {
-                    Tile::Wall => '#',
-                    Tile::Robot => '@',
-                    Tile::Empty => '.',
-                    Tile::Box => 'O',
-                };
-                print!("{}", c);
-            }
-            println!();
-        }
-    }
 
     fn push_tile(
         warehouse: &mut Array2D<Tile>,
@@ -154,23 +130,13 @@ pub fn part1(input: &InputType) -> usize {
         }
     }
 
-    fn gps(warehouse: Array2D<Tile>) -> usize {
-        warehouse
-            .enumerate_row_major()
-            .filter_map(|((row, col), tile)| match tile {
-                Tile::Box => Some(row * 100 + col),
-                _ => None,
-            })
-            .sum()
+    for command in input.moveset.iter() {
+        if let Ok(position) = push_tile(&mut warehouse, &bounds, robot, *command) {
+            robot = position;
+        }
     }
 
     gps(warehouse)
-}
-
-fn swap(warehouse: &mut Array2D<Tile>, position: Point<u32>, target: Point<u32>) {
-    let current = warehouse[(position.y as usize, position.x as usize)];
-    warehouse[(target.y as usize, target.x as usize)] = current;
-    warehouse[(position.y as usize, position.x as usize)] = Tile::Empty;
 }
 
 /// ```rust
@@ -197,8 +163,180 @@ fn swap(warehouse: &mut Array2D<Tile>, position: Point<u32>, target: Point<u32>)
 /// <><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
 /// ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
 /// v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^");
-/// assert_eq!(0, part2(&input));
+/// assert_eq!(9021, part2(&input));
 /// ```
-pub fn part2(input: &InputType) -> i64 {
-    0
+pub fn part2(input: &InputType) -> usize {
+    let bounds = UPoint::new(
+        (input.floorplan.column_len() * 2) as u32,
+        input.floorplan.row_len() as u32,
+    );
+
+    // Enthiccen
+    let thicc = input
+        .floorplan
+        .elements_row_major_iter()
+        .flat_map(|tile| match tile {
+            Tile::Box => [Tile::BoxL, Tile::BoxR],
+            Tile::Robot => [Tile::Robot, Tile::Empty],
+            Tile::Wall => [Tile::Wall, Tile::Wall],
+            _ => [Tile::Empty, Tile::Empty],
+        });
+    let mut warehouse =
+        Array2D::from_iter_row_major(thicc, bounds.y as usize, bounds.x as usize).unwrap();
+    let ((row, col), _) = warehouse
+        .enumerate_row_major()
+        .find(|(_, &tile)| tile == Tile::Robot)
+        .unwrap();
+    warehouse[(row, col)] = Tile::Empty;
+    let mut robot = UPoint::new(col as u32, row as u32);
+
+    fn can_push_vertical(
+        warehouse: &mut Array2D<Tile>,
+        bounds: &UPoint,
+        position: UPoint,
+        direction: Direction,
+    ) -> bool {
+        if let Some(target) = position.direction_checked(direction, bounds) {
+            match warehouse[(target.y as usize, target.x as usize)] {
+                Tile::Empty => true,
+                Tile::BoxL => {
+                    can_push_vertical(warehouse, bounds, target, direction)
+                        && can_push_vertical(
+                            warehouse,
+                            bounds,
+                            UPoint::new(target.x + 1, target.y),
+                            direction,
+                        )
+                }
+                Tile::BoxR => {
+                    can_push_vertical(warehouse, bounds, target, direction)
+                        && can_push_vertical(
+                            warehouse,
+                            bounds,
+                            UPoint::new(target.x - 1, target.y),
+                            direction,
+                        )
+                }
+                Tile::Wall => false,
+                _ => unreachable!(),
+            }
+        } else {
+            false
+        }
+    }
+
+    fn push_tile_vertical(
+        warehouse: &mut Array2D<Tile>,
+        bounds: &UPoint,
+        position: UPoint,
+        direction: Direction,
+    ) -> Result<UPoint, ()> {
+        if let Some(target) = position.direction_checked(direction, bounds) {
+            match warehouse[(target.y as usize, target.x as usize)] {
+                Tile::Empty => {
+                    swap(warehouse, position, target);
+                    Ok(target)
+                }
+                Tile::BoxL => {
+                    if push_tile_vertical(warehouse, bounds, target, direction).is_ok()
+                        && push_tile_vertical(
+                            warehouse,
+                            bounds,
+                            UPoint::new(target.x + 1, target.y),
+                            direction,
+                        )
+                        .is_ok()
+                    {
+                        swap(warehouse, position, target);
+                        Ok(target)
+                    } else {
+                        Err(())
+                    }
+                }
+                Tile::BoxR => {
+                    if push_tile_vertical(warehouse, bounds, target, direction).is_ok()
+                        && push_tile_vertical(
+                            warehouse,
+                            bounds,
+                            UPoint::new(target.x - 1, target.y),
+                            direction,
+                        )
+                        .is_ok()
+                    {
+                        swap(warehouse, position, target);
+                        Ok(target)
+                    } else {
+                        Err(())
+                    }
+                }
+                Tile::Wall => Err(()),
+                _ => unreachable!(),
+            }
+        } else {
+            Err(())
+        }
+    }
+
+    fn push_tile_horizontal(
+        warehouse: &mut Array2D<Tile>,
+        bounds: &UPoint,
+        position: UPoint,
+        direction: Direction,
+    ) -> Result<UPoint, ()> {
+        if let Some(target) = position.direction_checked(direction, bounds) {
+            match warehouse[(target.y as usize, target.x as usize)] {
+                Tile::Empty => {
+                    swap(warehouse, position, target);
+                    Ok(target)
+                }
+                Tile::BoxL | Tile::BoxR => {
+                    if let Ok(_) = push_tile_horizontal(warehouse, bounds, target, direction) {
+                        swap(warehouse, position, target);
+                        Ok(target)
+                    } else {
+                        Err(())
+                    }
+                }
+                Tile::Wall => Err(()),
+                _ => panic!("FK"),
+            }
+        } else {
+            Err(())
+        }
+    }
+
+    for command in input.moveset.iter() {
+        if let Ok(position) = match command {
+            Direction::North | Direction::South => {
+                if can_push_vertical(&mut warehouse, &bounds, robot, *command) {
+                    push_tile_vertical(&mut warehouse, &bounds, robot, *command)
+                } else {
+                    Err(())
+                }
+            }
+            Direction::East | Direction::West => {
+                push_tile_horizontal(&mut warehouse, &bounds, robot, *command)
+            }
+        } {
+            robot = position;
+        }
+    }
+
+    gps(warehouse)
+}
+
+fn gps(warehouse: Array2D<Tile>) -> usize {
+    warehouse
+        .enumerate_row_major()
+        .filter_map(|((row, col), tile)| match tile {
+            Tile::Box | Tile::BoxL => Some(row * 100 + col),
+            _ => None,
+        })
+        .sum()
+}
+
+fn swap(warehouse: &mut Array2D<Tile>, position: Point<u32>, target: Point<u32>) {
+    let current = warehouse[(position.y as usize, position.x as usize)];
+    warehouse[(target.y as usize, target.x as usize)] = current;
+    warehouse[(position.y as usize, position.x as usize)] = Tile::Empty;
 }
