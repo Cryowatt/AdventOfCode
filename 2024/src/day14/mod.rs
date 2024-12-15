@@ -1,8 +1,5 @@
-use core::hash;
-use std::{collections::HashSet, i32};
-
 use advent::*;
-use num::traits::Euclid;
+use array2d::Array2D;
 use regex::Regex;
 
 advent_day!(Day14, parse, Vec<Robot>, part1, part2);
@@ -114,13 +111,16 @@ pub fn part2_with_bounds<const WIDTH: i32, const HEIGHT: i32, const TREE_RUN: i3
     }
 
     fn run_length<const WIDTH: i32, const HEIGHT: i32>(robots: &Vec<Robot>) -> u32 {
+        let mut robo_grid = Array2D::filled_with(false, HEIGHT as usize, WIDTH as usize);
         let mut max_run = 0;
-        let robo_positions: HashSet<Point<i32>> =
-            HashSet::from_iter(robots.iter().map(|robot| robot.position));
+        for position in robots.iter().map(|robot| robot.position) {
+            robo_grid[(position.y as usize, position.x as usize)] = true;
+        }
+
         for y in 0..HEIGHT {
             let mut run_length = 0;
             for x in 0..WIDTH {
-                if robo_positions.contains(&IPoint::new(x, y)) {
+                if robo_grid[(y as usize, x as usize)] {
                     run_length += 1;
                 } else {
                     max_run = max_run.max(run_length);
