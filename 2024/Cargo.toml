@@ -11,6 +11,7 @@ name = "day"
 
 [dependencies]
 advent = { path = "../advent" }
+array2d = "0.3"
 bitflags = "2.4"
 crossterm = "0.28"
 ctor = "0.2"
