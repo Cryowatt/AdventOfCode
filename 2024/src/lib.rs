@@ -1,5 +1,5 @@
 // #![feature(ascii_char)]
-#![feature(async_closure)]
+// #![feature(async_closure)]
 // #![feature(bound_map)]
 #![feature(coroutines)]
 // #![feature(extend_one)]
