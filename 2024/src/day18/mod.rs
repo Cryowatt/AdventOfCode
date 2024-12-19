@@ -1,8 +1,7 @@
-use std::{collections::BinaryHeap, fmt::format};
+use std::collections::BinaryHeap;
 
 use advent::*;
 use array2d::Array2D;
-use regex::Regex;
 
 advent_day!(Day18, parse, Vec<UPoint>, part1, part2);
 
