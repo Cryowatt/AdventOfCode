@@ -1,5 +1,7 @@
 use advent::*;
+use dashmap::DashMap;
 use onig::Regex;
+use rayon::prelude::*;
 
 advent_day!(Day19, parse, (Vec<&'a str>, Vec<&'a str>), part1, part2);
 
@@ -29,10 +31,9 @@ pub fn part1(input: &InputType) -> usize {
     let mut pattern = String::from("^(");
     pattern.push_str(towels.join("|").as_str());
     pattern.push_str(")+$");
-    println!("{}", pattern);
     let matcher = Regex::new(&pattern).unwrap();
     designs
-        .iter()
+        .par_iter()
         .filter(|design| matcher.is_match(design))
         .count()
 }
@@ -50,8 +51,30 @@ pub fn part1(input: &InputType) -> usize {
 /// bwurrg
 /// brgr
 /// bbrgwb");
-/// assert_eq!(0, part2(&input));
+/// assert_eq!(16, part2(&input));
 /// ```
-pub fn part2(input: &InputType) -> u32 {
-    0
+pub fn part2(input: &InputType) -> u64 {
+    let (towels, designs) = input;
+    let memo = &DashMap::new();
+
+    fn combos<'a>(design: &'a str, towels: &Vec<&str>, memo: &DashMap<&'a str, u64>) -> u64 {
+        if design.is_empty() {
+            1
+        } else if let Some(count) = memo.get(design) {
+            *count
+        } else {
+            let count = towels
+                .iter()
+                .filter(|&&towel| design.starts_with(towel))
+                .map(|&towel| combos(&design[towel.len()..], towels, memo))
+                .sum();
+            memo.insert(design, count);
+            count
+        }
+    }
+
+    designs
+        .par_iter()
+        .map(|design| combos(design, towels, memo))
+        .sum()
 }
