@@ -56,29 +56,6 @@ enum Byte {
     Corrupt,
 }
 
-#[derive(Debug, Clone, Copy)]
-struct MinScore<T>(u32, T);
-
-impl<T> Ord for MinScore<T> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        other.0.cmp(&self.0)
-    }
-}
-
-impl<T> PartialOrd for MinScore<T> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl<T> Eq for MinScore<T> {}
-
-impl<T> PartialEq for MinScore<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-
 pub fn memory_space<const WIDTH: u32, const HEIGHT: u32, const BYTES: u32>(
     input: &InputType,
 ) -> u32 {

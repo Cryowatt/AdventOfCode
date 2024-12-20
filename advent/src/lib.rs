@@ -368,3 +368,26 @@ where
         Point3D::new(self.x.sub(rhs.x), self.y.sub(rhs.y), self.z.sub(rhs.z))
     }
 }
+
+#[derive(Debug, Clone, Copy)]
+pub struct MinScore<T>(pub u32, pub T);
+
+impl<T> Ord for MinScore<T> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.0.cmp(&self.0)
+    }
+}
+
+impl<T> PartialOrd for MinScore<T> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<T> Eq for MinScore<T> {}
+
+impl<T> PartialEq for MinScore<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
