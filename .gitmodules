@@ -1,0 +1,3 @@
+[submodule "AdventOfCodeInput"]
+	path = AdventOfCodeInput
+	url = https://github.com/Cryowatt/AdventOfCodeInput.git
