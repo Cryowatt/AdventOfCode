@@ -4,8 +4,8 @@ use std::{
 };
 
 fn main() -> std::io::Result<()> {
-    for dir in read_dir("../AdventOfCodeInput/2024")
-        .expect("Could not load input files from ../AdventOfCodeInput/2024")
+    for dir in read_dir("../AdventOfCodeInput/2023")
+        .expect("Could not load input files from ../AdventOfCodeInput/2023")
     {
         if let Ok(dir) = dir {
             let source_path = dir.path();
