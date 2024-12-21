@@ -5,7 +5,7 @@
 // #![feature(extend_one)]
 // #![feature(int_roundings)]
 // #![feature(isqrt)]
-// #![feature(iter_from_coroutine)]
+#![feature(iter_from_coroutine)]
 #![feature(iter_map_windows)]
 // #![feature(lazy_cell)]
 #![feature(map_try_insert)]
