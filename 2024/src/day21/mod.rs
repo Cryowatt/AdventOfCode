@@ -1,12 +1,20 @@
+// use crossterm::{input, terminal, KeyEvent};
 use std::{
     array,
     fmt::{Display, Write},
-    iter,
+    fs::create_dir,
+    io, iter,
     str::FromStr,
 };
 
 use advent::*;
 use array2d::Array2D;
+use crossterm::{
+    event::read,
+    execute,
+    style::Stylize,
+    terminal::{self, Clear},
+};
 
 advent_day!(Day21, parse, Vec<[DoorCodeKey; 4]>, part1, part2);
 
@@ -45,7 +53,7 @@ impl Display for RobotKey {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DoorCodeKey {
     D0,
     D1,
@@ -275,7 +283,7 @@ fn door_code_step(from: DoorCodeKey, to: &DoorCodeKey) -> IPoint {
 }
 
 fn robot_key_step(from: RobotKey, to: RobotKey) -> (RobotKey, RobotKey) {
-    // [.][^][A]
+    //    [^][A]
     // [<][v][>]
     match from {
         RobotKey::Up => match to {
@@ -296,7 +304,7 @@ fn robot_key_step(from: RobotKey, to: RobotKey) -> (RobotKey, RobotKey) {
             RobotKey::Down => (RobotKey::Down, RobotKey::A),
             RobotKey::Up => (RobotKey::Up, RobotKey::Up),
             RobotKey::Left => (RobotKey::Left, RobotKey::Left),
-            _ => (RobotKey::Right, RobotKey::Right),
+            RobotKey::Right | RobotKey::A => (RobotKey::Right, RobotKey::Right),
         },
         RobotKey::A => match to {
             RobotKey::A => (RobotKey::A, RobotKey::A),
@@ -407,6 +415,173 @@ fn vertical_oriendtation(door_key: DoorCodeKey, key: &DoorCodeKey) -> bool {
     vertical_first
 }
 
+struct DoorPanel {
+    key: DoorCodeKey,
+    typed: String,
+}
+
+impl DoorPanel {
+    pub fn new() -> Self {
+        Self {
+            key: DoorCodeKey::A,
+            typed: String::new(),
+        }
+    }
+
+    fn render(&self) {
+        let key = |key, label: &str| {
+            if key == self.key {
+                label.to_owned().blue()
+            } else {
+                label.to_owned().dark_grey()
+            }
+        };
+        println!("[{:?}]", self.typed);
+        println!(
+            "[ {} ][ {} ][ {} ]",
+            key(DoorCodeKey::D7, "7"),
+            key(DoorCodeKey::D8, "8"),
+            key(DoorCodeKey::D9, "9")
+        );
+        println!(
+            "[ {} ][ {} ][ {} ]",
+            key(DoorCodeKey::D4, "4"),
+            key(DoorCodeKey::D5, "5"),
+            key(DoorCodeKey::D6, "6")
+        );
+        println!(
+            "[ {} ][ {} ][ {} ]",
+            key(DoorCodeKey::D1, "1"),
+            key(DoorCodeKey::D2, "2"),
+            key(DoorCodeKey::D3, "3")
+        );
+        println!(
+            "     [ {} ][ {} ]",
+            key(DoorCodeKey::D0, "0"),
+            key(DoorCodeKey::A, "A")
+        );
+        println!();
+    }
+
+    // [7][8][9]
+    // [4][5][6]
+    // [1][2][3]
+    //    [0][A]
+    fn input(&mut self, door_bot_key: RobotKey) {
+        self.key = match (self.key, door_bot_key) {
+            (DoorCodeKey::D0, RobotKey::Up) => DoorCodeKey::D2,
+            (DoorCodeKey::D0, RobotKey::Right) => DoorCodeKey::A,
+            (DoorCodeKey::D1, RobotKey::Up) => DoorCodeKey::D4,
+            (DoorCodeKey::D1, RobotKey::Right) => DoorCodeKey::D2,
+            (DoorCodeKey::D2, RobotKey::Up) => DoorCodeKey::D5,
+            (DoorCodeKey::D2, RobotKey::Left) => DoorCodeKey::D1,
+            (DoorCodeKey::D2, RobotKey::Right) => DoorCodeKey::D3,
+            (DoorCodeKey::D2, RobotKey::Down) => DoorCodeKey::D0,
+            (DoorCodeKey::D3, RobotKey::Up) => DoorCodeKey::D6,
+            (DoorCodeKey::D3, RobotKey::Left) => DoorCodeKey::D2,
+            (DoorCodeKey::D3, RobotKey::Down) => DoorCodeKey::A,
+            (DoorCodeKey::D4, RobotKey::Up) => DoorCodeKey::D7,
+            (DoorCodeKey::D4, RobotKey::Right) => DoorCodeKey::D5,
+            (DoorCodeKey::D4, RobotKey::Down) => DoorCodeKey::D1,
+            (DoorCodeKey::D5, RobotKey::Up) => DoorCodeKey::D8,
+            (DoorCodeKey::D5, RobotKey::Left) => DoorCodeKey::D4,
+            (DoorCodeKey::D5, RobotKey::Right) => DoorCodeKey::D6,
+            (DoorCodeKey::D5, RobotKey::Down) => DoorCodeKey::D2,
+            (DoorCodeKey::D6, RobotKey::Up) => DoorCodeKey::D9,
+            (DoorCodeKey::D6, RobotKey::Left) => DoorCodeKey::D5,
+            (DoorCodeKey::D6, RobotKey::Down) => DoorCodeKey::D3,
+            (DoorCodeKey::D7, RobotKey::Right) => DoorCodeKey::D8,
+            (DoorCodeKey::D7, RobotKey::Down) => DoorCodeKey::D4,
+            (DoorCodeKey::D8, RobotKey::Left) => DoorCodeKey::D7,
+            (DoorCodeKey::D8, RobotKey::Right) => DoorCodeKey::D9,
+            (DoorCodeKey::D8, RobotKey::Down) => DoorCodeKey::D5,
+            (DoorCodeKey::D9, RobotKey::Left) => DoorCodeKey::D8,
+            (DoorCodeKey::D9, RobotKey::Down) => DoorCodeKey::D6,
+            (DoorCodeKey::A, RobotKey::Up) => DoorCodeKey::D3,
+            (DoorCodeKey::A, RobotKey::Left) => DoorCodeKey::D0,
+            (_, RobotKey::A) => self.key,
+            _ => panic!("fk"),
+        };
+
+        if door_bot_key == RobotKey::A {
+            let c = match self.key {
+                DoorCodeKey::D0 => '0',
+                DoorCodeKey::D1 => '1',
+                DoorCodeKey::D2 => '2',
+                DoorCodeKey::D3 => '3',
+                DoorCodeKey::D4 => '4',
+                DoorCodeKey::D5 => '5',
+                DoorCodeKey::D6 => '6',
+                DoorCodeKey::D7 => '7',
+                DoorCodeKey::D8 => '8',
+                DoorCodeKey::D9 => '9',
+                DoorCodeKey::A => 'A',
+                _ => panic!(),
+            };
+
+            self.typed.push(c);
+        }
+    }
+}
+
+struct RobotRemote {
+    key: RobotKey,
+}
+
+impl RobotRemote {
+    pub fn new() -> Self {
+        Self { key: RobotKey::A }
+    }
+
+    fn input(&mut self, key: RobotKey) -> Option<RobotKey> {
+        //    [^][A]
+        // [<][v][>]
+        self.key = match (self.key, key) {
+            (RobotKey::Up, RobotKey::Right) => RobotKey::A,
+            (RobotKey::Up, RobotKey::Down) => RobotKey::Down,
+            (RobotKey::Left, RobotKey::Right) => RobotKey::Down,
+            (RobotKey::Right, RobotKey::Up) => RobotKey::A,
+            (RobotKey::Right, RobotKey::Left) => RobotKey::Down,
+            (RobotKey::Down, RobotKey::Up) => RobotKey::Up,
+            (RobotKey::Down, RobotKey::Left) => RobotKey::Left,
+            (RobotKey::Down, RobotKey::Right) => RobotKey::Right,
+            (RobotKey::A, RobotKey::Left) => RobotKey::Up,
+            (RobotKey::A, RobotKey::Down) => RobotKey::Right,
+            (_, RobotKey::A) => self.key,
+            _ => panic!("Illegal"),
+        };
+
+        if key == RobotKey::A {
+            Some(self.key)
+        } else {
+            None
+        }
+    }
+
+    fn render(&self) {
+        let key = |key: RobotKey, label: &str| {
+            if key == self.key {
+                label.to_owned().blue()
+            } else {
+                label.to_owned().dark_grey()
+            }
+        };
+        let fk = "foo".blue();
+        println!(
+            "     [ {} ][ {} ]",
+            key(RobotKey::Up, "^"),
+            key(RobotKey::A, "A")
+        );
+        println!(
+            "[ {} ][ {} ][ {} ]",
+            key(RobotKey::Left, "<"),
+            key(RobotKey::Down, "v"),
+            key(RobotKey::Right, ">")
+        );
+        println!();
+    }
+}
+
 /// ```rust
 /// use advent_of_code_2024::day21::*;
 /// let input = parse(
@@ -420,10 +595,35 @@ fn vertical_oriendtation(door_key: DoorCodeKey, key: &DoorCodeKey) -> bool {
 /// too high: 171460
 /// too low: 162200
 /// bad: 166248
+/// bad: 167578
 
 pub fn part1(input: &InputType) -> u32 {
     door_check();
     robot_check();
+    // term
+
+    // let mut stdout = io::stdout();
+
+    // for code in input.iter() {
+    //     println!("Code {:?}", code);
+
+    //     let mut door_panel = DoorPanel::new();
+    //     let mut door_bot_remote = RobotRemote::new();
+    //     let mut bot_bot_remote = RobotRemote::new();
+    //     for key in key_bot(key_bot(door_bot(code))) {
+    //         if let Some(door_bot_key) = bot_bot_remote.input(key) {
+    //             if let Some(door_panel_key) = door_bot_remote.input(door_bot_key) {
+    //                 door_panel.input(door_panel_key);
+    //             }
+    //         }
+
+    //         println!("User: {}", key);
+    //         bot_bot_remote.render();
+    //         door_bot_remote.render();
+    //         door_panel.render();
+    //         read();
+    //     }
+    // }
     // door_check();
     // robot_check();
 
@@ -436,14 +636,6 @@ pub fn part1(input: &InputType) -> u32 {
     //         yield 3;
     //     },
     // );
-
-    // [7][8][9]
-    // [4][5][6]
-    // [1][2][3]
-    //    [0][A]
-
-    //    [^][A]
-    // [<][v][>]
     //       v<<A>>^A<vA<A>>^AAvA<^A>AA<vA<A>>^AvAA^AAv<<A>^A>AAA<vA<A>>^AvA^AAAA  68 * 29
     // -1:   v<<A>>^A<A>AvA<^AA>A<vAAA>^A
     //       v<<A>>^A<A>AvA<^AA>A<vAAA>^A
