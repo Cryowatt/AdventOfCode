@@ -4,6 +4,7 @@ use std::{
 };
 
 fn main() -> std::io::Result<()> {
+    println!("cargo::rerun-if-changed=../AdventOfCodeInput/2024");
     for dir in read_dir("../AdventOfCodeInput/2024")
         .expect("Could not load input files from ../AdventOfCodeInput/2024")
     {
