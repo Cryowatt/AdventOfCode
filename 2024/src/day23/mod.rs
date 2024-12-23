@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use advent::*;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use rayon::prelude::*;
 
 advent_day!(Day23, parse, Vec<(&'a str, &'a str)>, part1, part2);
 
@@ -49,57 +49,53 @@ pub fn parse(input: &str) -> InputType {
 /// td-yn");
 /// assert_eq!(7, part1(&input));
 /// ```
-pub fn part1(input: &InputType) -> u64 {
+/// TOO HIGH: 2335
+pub fn part1(input: &InputType) -> usize {
     let mut edges: HashMap<&str, HashSet<&str>> = HashMap::new();
-    let mut t_nodes = HashSet::new();
+    let mut all_nodes = HashSet::new();
 
     for (node_a, node_b) in input.iter() {
-        if node_a.contains('t') {
-            t_nodes.insert(node_a);
+        all_nodes.insert(node_a);
+        all_nodes.insert(node_b);
+
+        if let Some(edge_set) = edges.get_mut(node_a) {
+            edge_set.insert(node_b);
+        } else {
+            edges.insert(node_a, HashSet::from([*node_b]));
         }
 
-        if node_b.contains('t') {
-            t_nodes.insert(node_b);
-        }
-
-        match edges.get_mut(node_a) {
-            Some(node_edges) => node_edges,
-            None => edges.insert(node_a, HashSet::new()).unwrap(),
-        }
-
-        match edges.get_mut(node_b) {
-            Some(node_edges) => node_edges.push(node_a),
-            None => _ = edges.insert(node_b, vec![*node_a]),
+        if let Some(edge_set) = edges.get_mut(node_b) {
+            edge_set.insert(node_a);
+        } else {
+            edges.insert(node_b, HashSet::from([*node_a]));
         }
     }
 
-    let mut count = 0;
-    let mut net = vec![];
-    for node in t_nodes {
-        net.push(node);
-        for child_node in edges.get(node).unwrap().iter()
-        // .filter(|child_node| !child_node.contains('t') || node < child_node)
-        {
-            net.push(child_node);
+    all_nodes
+        .par_iter()
+        .map(|&node| {
+            let pairs = edges.get(node).unwrap();
+            pairs
+                .iter()
+                .filter(|&pair_node| node < pair_node)
+                .map(|&pair_node| {
+                    let trios = edges
+                        .get(pair_node)
+                        .unwrap()
+                        .intersection(pairs)
+                        .filter(|&trio_node| pair_node < trio_node);
 
-            for grandchild_node in edges.get(child_node).unwrap().iter()
-            // .filter(|&grandchild_node| {
-            //     grandchild_node != node
-            //         && (!grandchild_node.contains('t') || node < grandchild_node)
-            // })
-            {
-                net.push(grandchild_node);
-                println!("{:?}", net);
-                count += 1;
-                net.pop();
-            }
-            net.pop();
-        }
-        net.pop();
-    }
-    println!("COUNT: {}", count);
-
-    0
+                    trios
+                        .filter(|&trio_node| {
+                            node.starts_with('t')
+                                || pair_node.starts_with('t')
+                                || trio_node.starts_with('t')
+                        })
+                        .count()
+                })
+                .sum::<usize>()
+        })
+        .sum()
 }
 
 /// ```rust
@@ -139,6 +135,6 @@ pub fn part1(input: &InputType) -> u64 {
 /// td-yn");
 /// assert_eq!(0, part2(&input));
 /// ```
-pub fn part2(input: &InputType) -> i32 {
+pub fn part2(_input: &InputType) -> i32 {
     0
 }
