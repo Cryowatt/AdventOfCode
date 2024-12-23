@@ -1,3 +1,4 @@
+#![feature(array_windows)]
 // #![feature(ascii_char)]
 // #![feature(async_closure)]
 // #![feature(bound_map)]
