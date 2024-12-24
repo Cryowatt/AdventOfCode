@@ -49,7 +49,6 @@ pub fn parse(input: &str) -> InputType {
 /// td-yn");
 /// assert_eq!(7, part1(&input));
 /// ```
-/// TOO HIGH: 2335
 pub fn part1(input: &InputType) -> usize {
     let mut edges: HashMap<&str, HashSet<&str>> = HashMap::new();
     let mut all_nodes = HashSet::new();
