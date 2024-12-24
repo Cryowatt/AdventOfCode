@@ -1,6 +1,7 @@
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     str::FromStr,
+    sync::atomic::{AtomicBool, Ordering},
 };
 
 use advent::*;
@@ -72,6 +73,21 @@ impl FromStr for Operator {
 /// use advent_of_code_2024::day24::*;
 /// let input = parse(
 /// r"x00: 1
+/// x01: 1
+/// x02: 1
+/// y00: 0
+/// y01: 1
+/// y02: 0
+///
+/// x00 AND y00 -> z00
+/// x01 XOR y01 -> z01
+/// x02 OR y02 -> z02");
+/// assert_eq!(4, part1(&input));
+/// ```
+/// ```rust
+/// use advent_of_code_2024::day24::*;
+/// let input = parse(
+/// r"x00: 1
 /// x01: 0
 /// x02: 1
 /// x03: 1
@@ -120,8 +136,86 @@ impl FromStr for Operator {
 /// tnw OR pbm -> gnj");
 /// assert_eq!(2024, part1(&input));
 /// ```
-pub fn part1(input: &InputType) -> usize {
-    0
+pub fn part1(input: &InputType) -> u64 {
+    let (init, nodes) = input;
+
+    struct NodeSolver<'a> {
+        node: Option<&'a OpNode<'a>>,
+        result: AtomicBool,
+        resolved: AtomicBool,
+    }
+
+    impl NodeSolver<'_> {
+        fn solve(&self, solvers: &HashMap<&str, NodeSolver<'_>>) -> bool {
+            if self.resolved.load(Ordering::Relaxed) {
+                self.result.load(Ordering::Relaxed)
+            } else if let Some(node) = self.node {
+                let result = Self::solve_node(node, solvers);
+                self.result.store(result, Ordering::Relaxed);
+                self.resolved.store(true, Ordering::Relaxed);
+                result
+            } else {
+                panic!();
+            }
+        }
+
+        fn solve_node(node: &OpNode<'_>, solvers: &HashMap<&str, NodeSolver<'_>>) -> bool {
+            let lhs = Self::resolve_operand(node.lhs, solvers);
+            let rhs = Self::resolve_operand(node.rhs, solvers);
+            match node.op {
+                Operator::And => lhs & rhs,
+                Operator::Or => lhs | rhs,
+                Operator::Xor => lhs ^ rhs,
+            }
+        }
+
+        fn resolve_operand(label: &str, solvers: &HashMap<&str, NodeSolver<'_>>) -> bool {
+            let node = solvers.get(label).unwrap();
+            if node.resolved.load(Ordering::Relaxed) {
+                node.result.load(Ordering::Relaxed)
+            } else {
+                node.solve(solvers)
+            }
+        }
+    }
+
+    let mut node_solvers = nodes
+        .iter()
+        .map(|node| {
+            (
+                node.out,
+                NodeSolver {
+                    node: Some(node),
+                    result: AtomicBool::new(false),
+                    resolved: AtomicBool::new(false),
+                },
+            )
+        })
+        .collect::<HashMap<_, _>>();
+
+    node_solvers.extend(init.iter().map(|(&label, &value)| {
+        (
+            label,
+            NodeSolver {
+                node: None,
+                result: AtomicBool::new(value),
+                resolved: AtomicBool::new(true),
+            },
+        )
+    }));
+
+    let mut number = 0;
+    for n in (0..64).rev() {
+        if let Some(solver) = node_solvers.get(format!("z{:02}", n).as_str()) {
+            number <<= 1;
+
+            if solver.solve(&node_solvers) {
+                number += 1;
+            }
+        }
+    }
+
+    number
 }
 
 /// ```rust
