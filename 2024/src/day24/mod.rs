@@ -317,7 +317,7 @@ pub fn part2(input: &InputType) -> String {
                         if deps.len() == 2 {
                             if !deps.iter().any(|node| {
                                 node.op == Operator::Xor
-                                    && dependency_lookup[&node.out].out.starts_with("z")
+                                // TODO:? && dependency_lookup[&node.out].out.starts_with("z")
                             }) || !deps.iter().any(|node| node.op == Operator::And)
                             {
                                 bad_nodes.push(node.out);
