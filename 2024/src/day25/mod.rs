@@ -176,6 +176,6 @@ pub fn part1(input: &InputType) -> u32 {
 ///# #####");
 /// assert_eq!(0, part2(&input));
 /// ```
-pub fn part2(input: &InputType) -> i32 {
+pub fn part2(_input: &InputType) -> i32 {
     0
 }

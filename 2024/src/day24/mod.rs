@@ -217,28 +217,26 @@ pub fn part1(input: &InputType) -> u64 {
     number
 }
 
-pub fn shuffle_attempt() -> bool {
-    let input = parse(&INPUT);
-    let swaps = part2(&input).split(',').collect::<Vec<_>>();
-
-    // for
-
-    // false
-    true
-}
-
-/// ```rust
-/// use advent_of_code_2024::day24::*;
-/// assert_eq!(true, shuffle_attempt());
-/// ```
-pub fn part2(input: &InputType) -> String {
-    println!();
-    println!();
-    println!();
+pub fn part2<'a>(input: &'a InputType) -> String {
+    const X_NODES: [&'static str; 45] = [
+        "x00", "x01", "x02", "x03", "x04", "x05", "x06", "x07", "x08", "x09", "x10", "x11", "x12",
+        "x13", "x14", "x15", "x16", "x17", "x18", "x19", "x20", "x21", "x22", "x23", "x24", "x25",
+        "x26", "x27", "x28", "x29", "x30", "x31", "x32", "x33", "x34", "x35", "x36", "x37", "x38",
+        "x39", "x40", "x41", "x42", "x43", "x44",
+    ];
+    const Y_NODES: [&'static str; 45] = [
+        "y00", "y01", "y02", "y03", "y04", "y05", "y06", "y07", "y08", "y09", "y10", "y11", "y12",
+        "y13", "y14", "y15", "y16", "y17", "y18", "y19", "y20", "y21", "y22", "y23", "y24", "y25",
+        "y26", "y27", "y28", "y29", "y30", "y31", "y32", "y33", "y34", "y35", "y36", "y37", "y38",
+        "y39", "y40", "y41", "y42", "y43", "y44",
+    ];
+    const Z_NODES: [&'static str; 45] = [
+        "z00", "z01", "z02", "z03", "z04", "z05", "z06", "z07", "z08", "z09", "z10", "z11", "z12",
+        "z13", "z14", "z15", "z16", "z17", "z18", "z19", "z20", "z21", "z22", "z23", "z24", "z25",
+        "z26", "z27", "z28", "z29", "z30", "z31", "z32", "z33", "z34", "z35", "z36", "z37", "z38",
+        "z39", "z40", "z41", "z42", "z43", "z44",
+    ];
     let (_init, nodes) = input;
-    // Expectations:
-    // x + y into AND and XOR
-    // XOR -> z
 
     let dependency_lookup: &mut HashMap<&str, HashSet<&OpNode<'_>>> = &mut HashMap::new();
     let node_map = &mut HashMap::new();
@@ -258,398 +256,144 @@ pub fn part2(input: &InputType) -> String {
         }
     }
 
-    let mut bad_nodes = vec![];
+    let bad_nodes: &mut HashSet<&'a str> = &mut HashSet::new();
 
-    for node in nodes {
-        let deps = dependency_lookup.get(node.out);
-        match node.op {
-            Operator::And => {
-                // AND -> OR
-                if node.lhs == "x00" || node.rhs == "x00" {
-                    // This is fine
-                } else {
-                    if let Some(deps) = deps {
-                        if deps.len() == 1 {
-                            if deps.iter().next().unwrap().op != Operator::Or {
-                                println!("WRONG DEP OP {:?} {:?}", node, deps);
-                                bad_nodes.push(node.out);
-                            }
-                        } else {
-                            bad_nodes.push(node.out);
-                            println!("UNEXPECTED DEPS {:?} {:?}", node, deps);
-                        }
-                    } else {
-                        bad_nodes.push(node.out);
-                        println!("NO DEPS? {:?}", node);
-                    }
-                }
-            }
-            Operator::Or => {
-                // OR -> [XOR, AND]
-                if node.out == "z45" {
-                    // This is fine
-                } else {
-                    if let Some(deps) = deps {
-                        if deps.len() == 2 {
-                            if !deps.iter().any(|node| node.op == Operator::Xor)
-                                || !deps.iter().any(|node| node.op == Operator::And)
-                            {
-                                bad_nodes.push(node.out);
-                                println!("WRONG DEPS {:?} {:?}", node, deps);
-                            }
-                        } else {
-                            bad_nodes.push(node.out);
-                            println!("UNEXPECTED DEPS {:?} {:?}", node, deps);
-                        }
-                    } else {
-                        bad_nodes.push(node.out);
-                        println!("NO DEPS? {:?}", node);
-                    }
-                }
-            }
-            Operator::Xor => {
-                // XOR -> [XOR, AND]
-                // XOR -> [OUT]
-                if node.out.starts_with("z") {
-                    // Output node
-                } else {
-                    if let Some(deps) = deps {
-                        if deps.len() == 2 {
-                            if !deps.iter().any(|node| {
-                                node.op == Operator::Xor
-                                // TODO:? && dependency_lookup[&node.out].out.starts_with("z")
-                            }) || !deps.iter().any(|node| node.op == Operator::And)
-                            {
-                                bad_nodes.push(node.out);
-                                println!("WRONG DEPS {:?} {:?}", node, deps);
-                            }
-                        } else {
-                            bad_nodes.push(node.out);
-                            println!("UNEXPECTED DEPS {:?} {:?}", node, deps);
-                        }
-                    } else {
-                        bad_nodes.push(node.out);
-                        println!("NO DEPS? {:?}", node);
-                    }
-                }
-            }
+    let (_, half_carry0) = find_half_adder(X_NODES[0], Y_NODES[0], dependency_lookup, bad_nodes);
+
+    let mut carry = half_carry0;
+
+    for bit in 1..45 {
+        let (_, full_carry) = find_full_adder(
+            X_NODES[bit],
+            Y_NODES[bit],
+            carry,
+            Z_NODES[bit],
+            dependency_lookup,
+            bad_nodes,
+        );
+        carry = full_carry;
+    }
+
+    fn find_half_adder<'a>(
+        input_a: &'a str,
+        input_b: &'a str,
+        dependency_lookup: &mut HashMap<&str, HashSet<&'a OpNode<'a>>>,
+        bad_nodes: &mut HashSet<&'a str>,
+    ) -> (&'a str, &'a str) {
+        let sum =
+            find_node(input_a, input_b, Operator::Xor, dependency_lookup).unwrap_or_else(|| {
+                let (pair, bad_input_id) =
+                    partial_find_node(input_a, input_b, Operator::Xor, dependency_lookup);
+                bad_nodes.insert(bad_input_id);
+
+                pair
+            });
+        let carry =
+            find_node(input_a, input_b, Operator::And, dependency_lookup).unwrap_or_else(|| {
+                let (pair, bad_input_id) =
+                    partial_find_node(input_a, input_b, Operator::And, dependency_lookup);
+                bad_nodes.insert(bad_input_id);
+                pair
+            });
+
+        (sum.out, carry.out)
+    }
+
+    fn find_full_adder<'a>(
+        input_a: &'a str,
+        input_b: &'a str,
+        carry_in: &'a str,
+        expected_out: &'a str,
+        dependency_lookup: &mut HashMap<&str, HashSet<&'a OpNode<'a>>>,
+        bad_nodes: &mut HashSet<&'a str>,
+    ) -> (&'a str, &'a str) {
+        let mut last_error = None;
+        let (half_sum, half_carry) =
+            find_half_adder(input_a, input_b, dependency_lookup, bad_nodes);
+
+        if half_carry == expected_out {
+            bad_nodes.insert(half_carry);
+            last_error.replace(half_carry);
+        }
+
+        if half_sum == expected_out {
+            bad_nodes.insert(half_sum);
+            last_error.replace(half_sum);
+        }
+
+        let (full_sum, full_carry) =
+            find_half_adder(half_sum, carry_in, dependency_lookup, bad_nodes);
+
+        if full_sum != expected_out {
+            bad_nodes.insert(full_sum);
+            last_error.replace(full_sum);
+        }
+
+        if full_carry == expected_out {
+            bad_nodes.insert(full_carry);
+            last_error.replace(full_carry);
+        }
+
+        let carry_out = find_node(half_carry, full_carry, Operator::Or, dependency_lookup)
+            .unwrap_or_else(|| {
+                let (node, bad_input) =
+                    partial_find_node(half_carry, full_carry, Operator::Or, dependency_lookup);
+
+                bad_nodes.insert(bad_input);
+                node
+            });
+
+        if carry_out.out == expected_out {
+            bad_nodes.insert(carry_out.out);
+
+            (full_sum, last_error.unwrap())
+        } else {
+            (full_sum, carry_out.out)
         }
     }
 
-    // println!();
-    // println!();
-    println!();
-    println!();
-    println!();
-    println!("THE BADDIES {:?}", bad_nodes);
+    fn partial_find_node<'a>(
+        input_a: &'a str,
+        input_b: &'a str,
+        operator: Operator,
+        dependency_lookup: &mut HashMap<&str, HashSet<&'a OpNode<'a>>>,
+    ) -> (&'a OpNode<'a>, &'a str) {
+        let node_a = dependency_lookup
+            .get(input_a)
+            .map(|deps| deps.iter().filter(|dep| dep.op == operator).next())
+            .flatten();
 
-    bad_nodes.sort();
-    bad_nodes.join(",")
+        let node_b = dependency_lookup
+            .get(input_b)
+            .map(|deps| deps.iter().filter(|dep| dep.op == operator).next())
+            .flatten();
 
-    // fn guess_node_op<'a>(
-    //     node: &'a OpNode<'a>,
-    //     dependency_lookup: &mut HashMap<&str, HashSet<&'a OpNode<'a>>>,
-    // ) {
-    //     // node
-    // }
+        if node_a.is_some() {
+            (node_a.unwrap(), input_b)
+        } else if node_b.is_some() {
+            (node_b.unwrap(), input_a)
+        } else {
+            panic!("Can't find candidate");
+        }
+    }
 
-    // // println!("{:?}", dependency_lookup);
-    // for xor_node in nodes.iter().filter(|node| node.op == Operator::Xor) {
-    //     if (xor_node.lhs.starts_with('x') && xor_node.rhs.starts_with('y'))
-    //         || (xor_node.lhs.starts_with('y') && xor_node.rhs.starts_with('x'))
-    //             && xor_node.out != "z00"
-    //     {
-    //         // Node is half-sum, should output to full-sum (XOR) and carry-chain (AND)
-    //         if let Some(deps) = dependency_lookup.get(xor_node.out) {
-    //             if deps.iter().find(|node| node.op == Operator::Xor).is_none()
-    //                 || deps.iter().find(|node| node.op == Operator::And).is_none()
-    //             {
-    //                 println!("BAD ADDER OUT: {:?}", xor_node);
-    //             }
-    //         } else {
-    //             println!("BAD ADDER: {:?}", xor_node);
-    //         }
-    //     } else if !xor_node.out.starts_with('z') {
-    //         // Node is full-sum, should output to z
-    //         println!("BAD SUM OUT: {:?}", xor_node);
-    //     }
-    // }
+    fn find_node<'a>(
+        input_a: &str,
+        input_b: &str,
+        operator: Operator,
+        dependency_lookup: &mut HashMap<&str, HashSet<&'a OpNode<'a>>>,
+    ) -> Option<&'a OpNode<'a>> {
+        let deps_a = dependency_lookup.get(input_a)?;
+        let deps_b = dependency_lookup.get(input_b)?;
 
-    // let fk = INPUT;
+        deps_a
+            .intersection(deps_b)
+            .filter(|dep| dep.op == operator)
+            .cloned()
+            .next()
+    }
 
-    // // All XORs come from x+y _or_ out z
-    // for node in nodes
-    //     .iter()
-    //     .filter(|node| node.op != Operator::Xor && node.out.starts_with("z") && node.out != "z45")
-    // {
-    //     println!("BAD OUT {:?}", node);
-    // }
-
-    // for or_node in nodes.iter().filter(|node| node.op == Operator::Or) {
-    //     // Only carry
-    //     // Carry -> XOR -> ZOut
-    //     // AND & AND -> Carry
-
-    //     if let Some(deps) = dependency_lookup.get(or_node.out) {
-    //         if deps
-    //             .iter()
-    //             .find(|node| node.out.starts_with("z") && node.op == Operator::Xor)
-    //             .is_none()
-    //         {
-    //             println!("BAD CARRY {:?}", or_node);
-    //         }
-    //     } else {
-    //         println!("BAD CARRY OUT {:?}", or_node);
-    //     }
-    // }
-
-    // for and_node in nodes.iter().filter(|node| node.op == Operator::And) {
-    //     // Only outputs to OR
-    //     let deps = dependency_lookup.get(and_node.out).unwrap();
-    //     if !deps.iter().all(|node| node.op == Operator::Or) {
-    //         println!("BAD CARRY BLOCK {:?} {:?}", and_node, deps);
-    //     }
-    // }
-
-    // // println!("Swapped pairs");
-    // // for node in nodes.iter().filter(|node| {
-    // //     node.op == Operator::Xor
-    // //         && !node.out.starts_with("z")
-    // //         && !(node.lhs.starts_with('x') || node.rhs.starts_with('x'))
-    // // }) {
-    // //     println!("{:?}", node);
-    // // }
-
-    // fn find_node<'a>(
-    //     input_a: &str,
-    //     input_b: &str,
-    //     dependency_lookup: &mut HashMap<&str, HashSet<&'a OpNode<'a>>>,
-    // ) -> Option<Vec<&'a OpNode<'a>>> {
-    //     // println!("FInd node {} {}", input_a, input_b);
-    //     let deps_a = dependency_lookup.get(input_a)?;
-    //     let deps_b = dependency_lookup.get(input_b)?;
-
-    //     let nodes = deps_a.intersection(deps_b).cloned().collect::<Vec<_>>();
-    //     if nodes.is_empty() {
-    //         println!("Failed to find node {}&{}: {:?}", input_a, input_b, nodes);
-    //         None
-    //     } else {
-    //         Some(nodes)
-    //     }
-    // }
-
-    // enum FindResult<'a> {
-    //     Err,
-    //     Partial(&'a OpNode<'a>, &'a str),
-    //     Ok(&'a OpNode<'a>),
-    // }
-
-    // // fn find_node_op<'a>(
-    // //     input_a: &str,
-    // //     input_b: &str,
-    // //     dependency_lookup: &mut HashMap<&str, HashSet<&'a OpNode<'a>>>,
-    // // ) -> FindResult<'a> {
-    // //     // println!("FInd node {} {}", input_a, input_b);
-    // //     let deps_a = dependency_lookup.get(input_a).unwrap();
-    // //     let deps_b = dependency_lookup.get(input_b).unwrap();
-
-    // //     let nodes = deps_a.intersection(deps_b).cloned().collect::<Vec<_>>();
-    // //     if nodes.is_empty() {
-    // //         println!("Failed to find node {}&{}: {:?}", input_a, input_b, nodes);
-    // //         None
-    // //     } else {
-    // //         Some(nodes)
-    // //     }
-    // // }
-
-    // let mut full_sum: Option<&OpNode<'_>> = None;
-    // let mut full_carry: Option<&OpNode<'_>> = None;
-
-    // for node in find_node("x00", "y00", dependency_lookup).unwrap() {
-    //     if let Some(_dupe) = match node.op {
-    //         Operator::Xor => full_sum.replace(node),
-    //         Operator::And => full_carry.replace(node),
-    //         Operator::Or => {
-    //             panic!("Fuck")
-    //         }
-    //     } {
-    //         panic!("Fuck")
-    //     }
-    // }
-
-    // for bit in 1..45 {
-    //     let x_label = format!("x{:02}", bit);
-    //     let y_label = format!("y{:02}", bit);
-
-    //     print!(
-    //         "Bit {} A:{}, B:{}, carry-in:{} ",
-    //         bit,
-    //         x_label,
-    //         y_label,
-    //         full_carry.unwrap().out
-    //     );
-
-    //     let mut half_sum: Option<&OpNode<'_>> = None;
-    //     let mut half_carry: Option<&OpNode<'_>> = None;
-    //     let mut carry_chain: Option<&OpNode<'_>> = None;
-
-    //     // let x = dependency_lookup.get(&x_label);
-    //     // let y = dependency_lookup.get(&y_label);
-
-    //     for node in find_node(&x_label, &y_label, dependency_lookup).unwrap() {
-    //         if let Some(dupe) = match node.op {
-    //             Operator::Xor => half_sum.replace(node),
-    //             Operator::And => half_carry.replace(node),
-    //             Operator::Or => {
-    //                 panic!("Fuck")
-    //             }
-    //         } {
-    //             println!("Found duplicate for {}: {:?} and {:?}", bit, node, dupe);
-    //         }
-    //     }
-
-    //     for node in find_node(
-    //         half_sum.unwrap().out,
-    //         full_carry.unwrap().out,
-    //         dependency_lookup,
-    //     )
-    //     .unwrap()
-    //     {
-    //         match node.op {
-    //             Operator::And => carry_chain.replace(node),
-    //             Operator::Or => panic!("fuck"),
-    //             Operator::Xor => full_sum.replace(node),
-    //         };
-    //     }
-
-    //     full_carry.replace(
-    //         find_node(
-    //             half_carry.unwrap().out,
-    //             carry_chain.unwrap().out,
-    //             dependency_lookup,
-    //         )
-    //         .unwrap()
-    //         .first()
-    //         .unwrap(),
-    //     );
-
-    //     println!(
-    //         "half-sum:{}, full-sum:{}, half-carry:{}, carry-chair:{}, carry-out: {}",
-    //         half_sum.unwrap().out,
-    //         full_sum.unwrap().out,
-    //         half_carry.unwrap().out,
-    //         carry_chain.unwrap().out,
-    //         full_carry.unwrap().out,
-    //     );
-    // // Full sum is half sum + carry-in (the previous full-carry)
-    // full_sum.replace(
-    //     find_node(
-    //         half_sum.unwrap().out,
-    //         full_carry.unwrap().out,
-    //         dependency_lookup,
-    //     )
-    //     .iter()
-    //     .find(|node| node.op == Operator::And)
-    //     .unwrap(),
-    // );
-
-    // // Carry chain is half-sum and carry in
-    // carry_chain.replace(
-    //     find_node(
-    //         half_sum.unwrap().out,
-    //         full_carry.unwrap().out,
-    //         dependency_lookup,
-    //     )
-    //     .iter()
-    //     .find(|node| node.op == Operator::And)
-    //     .unwrap(),
-    // );
-
-    // let fk = find_node(
-    //     half_sum.unwrap().out,
-    //     half_carry.unwrap().out,
-    //     dependency_lookup,
-    // );
-    // if let Some(deps) = dependency_lookup.get(half_carry.unwrap().out) {
-    //     if deps.len() > 1 {
-    //         println!("{:?}", deps);
-    //     }
-    // } else {
-    //     println!("Missing full-carry bit{:02}", bit);
-    // }
-    // println!("{:?}", fk);
-    // let bit_sum =
-    // let bit_carry
-    // }
-
-    // nodes.iter().flat_map(|node| [(node.lhs, node.out), (node.rhs,node.out)])
-
-    // let mut nodes = nodes
-    //     .iter()
-    //     .map(|node| (node.out, node))
-    //     .collect::<HashMap<_, _>>();
-
-    // let mut bit_sum = [None; 64];
-    // let mut bit_carry = [None; 64];
-
-    // for node in nodes {
-    //     if node.lhs.starts_with("x") {
-    //         if node.rhs.starts_with("y") && node.rhs.ends_with(&node.lhs[1..]) {
-    //             let bit = node.lhs[1..].parse::<u8>().unwrap();
-    //             match node.op {
-    //                 Operator::And => bit_carry[bit as usize] = Some(node.out),
-    //                 Operator::Xor => bit_sum[bit as usize] = Some(node.out),
-    //                 Operator::Or => panic!(),
-    //             }
-    //         } else {
-    //             panic!();
-    //         }
-    //     } else if node.lhs.starts_with("y") {
-    //         if node.rhs.starts_with("x") && node.rhs.ends_with(&node.rhs[1..]) {
-    //             let bit = node.lhs[1..].parse::<u8>().unwrap();
-    //             match node.op {
-    //                 Operator::And => bit_carry[bit as usize] = Some(node.out),
-    //                 Operator::Xor => bit_sum[bit as usize] = Some(node.out),
-    //                 Operator::Or => panic!(),
-    //             }
-    //         } else {
-    //             panic!();
-    //         }
-    //     }
-    // }
-
-    // let mut bit_carry_sum = [None; 64];
-
-    // for node in nodes {
-    //     if node.lhs.starts_with("x") {
-    //         if node.rhs.starts_with("y") && node.rhs.ends_with(&node.lhs[1..]) {
-    //             let bit = node.lhs[1..].parse::<u8>().unwrap();
-    //             match node.op {
-    //                 Operator::And => bit_carry[bit as usize] = Some(node.out),
-    //                 Operator::Xor => bit_sum[bit as usize] = Some(node.out),
-    //                 Operator::Or => panic!(),
-    //             }
-    //         } else {
-    //             panic!();
-    //         }
-    //     } else if node.lhs.starts_with("y") {
-    //         if node.rhs.starts_with("x") && node.rhs.ends_with(&node.rhs[1..]) {
-    //             let bit = node.lhs[1..].parse::<u8>().unwrap();
-    //             match node.op {
-    //                 Operator::And => bit_carry[bit as usize] = Some(node.out),
-    //                 Operator::Xor => bit_sum[bit as usize] = Some(node.out),
-    //                 Operator::Or => panic!(),
-    //             }
-    //         } else {
-    //             panic!();
-    //         }
-    //     }
-    // }
-    // let mut node_solvers = nodes
-    //     .iter()
-    //     .map(|node| (node.out, node))
-    //     .collect::<HashMap<_, _>>();
-    // println!("{:?}", node_solvers);
-    // let fk = super::day24::INPUT;
-    // String::new()
+    let mut answer_nodes = Vec::from_iter(bad_nodes.iter().cloned());
+    answer_nodes.sort();
+    answer_nodes.join(",")
 }
