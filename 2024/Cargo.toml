@@ -21,7 +21,7 @@ log = "0.4"
 nalgebra = "0.33"
 # ndarray = "0.15"
 # ndarray-linalg = "0.16"
-tokio = { version = "1.42", features = ["full"] }
+tokio = { version = "1.43", features = ["full"] }
 num = "0.4"
 onig = { version = "6.4.0", default-features = false }
 rayon = "1.8"
