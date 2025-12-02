@@ -3,6 +3,7 @@
 // #![feature(async_closure)]
 // #![feature(bound_map)]
 #![feature(coroutines)]
+#![feature(exact_div)]
 // #![feature(extend_one)]
 #![feature(int_roundings)]
 // #![feature(isqrt)]
