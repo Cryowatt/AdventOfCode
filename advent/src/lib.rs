@@ -391,3 +391,37 @@ impl<T> PartialEq for MinScore<T> {
         self.0 == other.0
     }
 }
+
+pub trait Decimal {
+    fn digits(self) -> u32;
+    fn shl10(self, digits: u32) -> Self;
+    fn shr10(self, digits: u32) -> Self;
+}
+
+impl Decimal for u32 {
+    fn digits(self) -> u32 {
+        self.ilog10() + 1
+    }
+
+    fn shl10(self, digits: u32) -> Self {
+        self * 10u32.pow(digits)
+    }
+
+    fn shr10(self, digits: u32) -> Self {
+        self / 10u32.pow(digits)
+    }
+}
+
+impl Decimal for u64 {
+    fn digits(self) -> u32 {
+        self.ilog10() + 1
+    }
+
+    fn shl10(self, digits: u32) -> Self {
+        self * 10u64.pow(digits)
+    }
+
+    fn shr10(self, digits: u32) -> Self {
+        self / 10u64.pow(digits)
+    }
+}

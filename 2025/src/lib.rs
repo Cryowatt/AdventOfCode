@@ -4,7 +4,7 @@
 // #![feature(bound_map)]
 #![feature(coroutines)]
 // #![feature(extend_one)]
-// #![feature(int_roundings)]
+#![feature(int_roundings)]
 // #![feature(isqrt)]
 #![feature(iter_from_coroutine)]
 #![feature(iter_map_windows)]
