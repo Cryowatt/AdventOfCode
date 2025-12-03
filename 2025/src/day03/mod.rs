@@ -68,3 +68,65 @@ pub fn part2(input: &InputType) -> u64 {
         })
         .sum()
 }
+
+advent_bench!(parse, queue_based, part2_queued);
+
+/// ```rust
+/// use advent_of_code_2025::day03::*;
+/// let input = parse(
+/// r"987654321111111
+/// 811111111111119
+/// 234234234234278
+/// 818181911112111");
+/// assert_eq!(part2_queued(&input), part2(&input));
+/// ```
+pub fn part2_queued(input: &InputType) -> u64 {
+    input
+        .iter()
+        .map(|line| {
+            let mut queue = line.clone();
+
+            let mut index = 1;
+            while queue.len() > 12 && index < queue.len() {
+                if queue[index] > queue[index - 1] {
+                    queue.remove(index - 1);
+                    index = (index - 1).max(1);
+                } else {
+                    index += 1;
+                }
+            }
+
+            println!("{:?}", queue);
+            queue[0..12].iter().fold(0, |acc, v| (acc * 10) + *v as u64)
+        })
+        .sum()
+}
+
+advent_bench!(parse, stack_based, part2_stack);
+
+/// ```rust
+/// use advent_of_code_2025::day03::*;
+/// let input = parse(
+/// r"987654321111111
+/// 811111111111119
+/// 234234234234278
+/// 818181911112111");
+/// assert_eq!(part2_stack(&input), part2(&input));
+/// ```
+pub fn part2_stack(input: &InputType) -> u64 {
+    input
+        .iter()
+        .map(|line| {
+            let mut stack: Vec<u8> = vec![];
+
+            for (index, &item) in line.iter().enumerate() {
+                while stack.len() + (line.len() - index) > 12
+                    && stack.pop_if(|v| *v < item).is_some()
+                {}
+                stack.push(item);
+            }
+
+            stack[0..12].iter().fold(0, |acc, v| (acc * 10) + *v as u64)
+        })
+        .sum()
+}
