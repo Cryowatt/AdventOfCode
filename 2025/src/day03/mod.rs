@@ -38,15 +38,33 @@ pub fn part1(input: &InputType) -> u64 {
         .sum()
 }
 
-//16720 low
-
 /// ```rust
 /// use advent_of_code_2025::day03::*;
 /// let input = parse(
-/// r"");
-/// assert_eq!(0, part2(&input));
+/// r"987654321111111
+/// 811111111111119
+/// 234234234234278
+/// 818181911112111");
+/// assert_eq!(3121910778619, part2(&input));
 /// ```
 pub fn part2(input: &InputType) -> u64 {
-    0
-    // todo!()
+    input
+        .iter()
+        .map(|line| {
+            let mut joltage = 0u64;
+            let mut index = 0;
+
+            for i in 0..12 {
+                let (offset, &digit) = line[index..line.len() - (11 - i)]
+                    .iter()
+                    .enumerate()
+                    .rev()
+                    .max_by_key(|&(_, value)| *value)
+                    .unwrap();
+                index += offset + 1;
+                joltage = joltage * 10 + digit as u64
+            }
+            joltage
+        })
+        .sum()
 }
