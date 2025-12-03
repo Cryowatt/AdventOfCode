@@ -16,12 +16,29 @@ pub fn parse(input: &str) -> InputType<'_> {
 /// ```rust
 /// use advent_of_code_2025::day03::*;
 /// let input = parse(
-/// r"");
-/// assert_eq!(todo!(), part1(&input));
+/// r"987654321111111
+/// 811111111111119
+/// 234234234234278
+/// 818181911112111");
+/// assert_eq!(357, part1(&input));
 /// ```
 pub fn part1(input: &InputType) -> u64 {
-    todo!()
+    input
+        .iter()
+        .map(|line| {
+            let (index, &first_digit) = line[..line.len() - 1]
+                .iter()
+                .enumerate()
+                .rev()
+                .max_by_key(|&(_, value)| *value)
+                .unwrap();
+            let &second_digit = line[index + 1..].iter().max().unwrap();
+            first_digit as u64 * 10 + second_digit as u64
+        })
+        .sum()
 }
+
+//16720 low
 
 /// ```rust
 /// use advent_of_code_2025::day03::*;
@@ -30,5 +47,6 @@ pub fn part1(input: &InputType) -> u64 {
 /// assert_eq!(0, part2(&input));
 /// ```
 pub fn part2(input: &InputType) -> u64 {
-    todo!()
+    0
+    // todo!()
 }
