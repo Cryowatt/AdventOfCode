@@ -4,7 +4,7 @@ use regex::Regex;
 
 advent_day!(Day13, parse, Vec<ClawGame>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     let pattern = Regex::new(
         r"Button A: X\+(?<AX>\d+), Y\+(?<AY>\d+)
 Button B: X\+(?<BX>\d+), Y\+(?<BY>\d+)

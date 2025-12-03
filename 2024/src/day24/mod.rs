@@ -15,7 +15,7 @@ advent_day!(
     part2
 );
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     let parser =
         Regex::new(r"(?<lhs>\w{3}) (?<op>AND|OR|XOR) (?<rhs>\w{3}) -> (?<out>\w{3})").unwrap();
     let init = HashMap::from_iter(

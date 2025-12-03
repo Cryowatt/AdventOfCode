@@ -8,7 +8,7 @@ pub enum Lockset {
     Lock([u8; 5]),
 }
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input
         .split("\n\n")
         .map(|block| {

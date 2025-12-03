@@ -11,7 +11,7 @@ pub enum Tile {
     Empty,
 }
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     Array2D::from_rows(
         &input
             .lines()

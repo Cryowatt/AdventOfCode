@@ -4,7 +4,7 @@ use advent::*;
 
 advent_day!(Day03, parse, str, part1, part2);
 
-pub fn parse(input: &str) -> &InputType {
+pub fn parse(input: &str) -> &InputType<'_> {
     input
 }
 

@@ -4,7 +4,7 @@ use regex::Regex;
 
 advent_day!(Day14, parse, Vec<Robot>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     let pattern = Regex::new(r"p=(?<PX>\d+),(?<PY>\d+) v=(?<VX>-?\d+),(?<VY>-?\d+)").unwrap();
     input
         .lines()

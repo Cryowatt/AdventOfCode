@@ -5,7 +5,7 @@ use array2d::Array2D;
 
 advent_day!(Day18, parse, Vec<UPoint>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input
         .lines()
         .map(|line| {

@@ -14,7 +14,7 @@ pub enum Tile {
     End,
 }
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     let rows = input.lines().count();
     let colums = input.lines().next().unwrap().len();
     Array2D::from_iter_row_major(

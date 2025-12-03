@@ -5,7 +5,7 @@ use rayon::prelude::*;
 
 advent_day!(Day19, parse, (Vec<&'a str>, Vec<&'a str>), part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     let towels = input.lines().next().unwrap().split(", ").collect();
     let designs = input.lines().skip(2).collect();
     (towels, designs)

@@ -4,7 +4,7 @@ use advent::*;
 
 advent_day!(Day09, parse, Vec<u8>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input.as_bytes().iter().map(|b| *b - b'0').collect()
 }
 

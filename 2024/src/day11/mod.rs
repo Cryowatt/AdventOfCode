@@ -5,7 +5,7 @@ use num::Integer;
 
 advent_day!(Day11, parse, Vec<u32>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input
         .split_whitespace()
         .map(|token| token.parse().unwrap())

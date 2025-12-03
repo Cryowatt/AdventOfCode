@@ -5,7 +5,7 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 advent_day!(Day22, parse, Vec<u32>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input.lines().map(|line| line.parse().unwrap()).collect()
 }
 

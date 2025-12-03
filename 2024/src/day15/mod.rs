@@ -19,7 +19,7 @@ pub enum Tile {
     Empty,
 }
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     let width = input.lines().next().unwrap().len();
     let floorplan = input.lines().take(width).flat_map(|line| {
         line.as_bytes().iter().map(|tile| match tile {

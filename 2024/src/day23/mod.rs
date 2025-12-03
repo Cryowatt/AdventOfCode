@@ -5,7 +5,7 @@ use rayon::prelude::*;
 
 advent_day!(Day23, parse, Vec<(&'a str, &'a str)>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input
         .lines()
         .map(|line| line.split_once('-').unwrap())

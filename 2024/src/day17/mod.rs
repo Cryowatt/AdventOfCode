@@ -117,7 +117,7 @@ impl<'a> Computer<'a> {
     }
 }
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     let pattern = Regex::new(
         r"Register A: (?<A>\d+)
 Register B: (?<B>\d+)

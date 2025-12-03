@@ -2,7 +2,7 @@ use advent::*;
 
 advent_day!(Day02, parse, Vec<Vec<i32>>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input
         .lines()
         .map(|line| {

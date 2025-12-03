@@ -2,7 +2,7 @@ use advent::*;
 
 advent_day!(Day04, parse, Vec<Vec<u8>>, part1, part2);
 
-pub fn parse(input: &str) -> InputType {
+pub fn parse(input: &str) -> InputType<'_> {
     input.lines().map(|line| line.as_bytes().to_vec()).collect()
 }
 
