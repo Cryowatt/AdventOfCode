@@ -1,7 +1,6 @@
 use itertools::Itertools;
 
 use advent::*;
-use num::Integer;
 
 advent_day!(Day02, parse, Vec<(u64, u64)>, part1, part2);
 
