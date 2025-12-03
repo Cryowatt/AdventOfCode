@@ -12,6 +12,7 @@
 // #![feature(lazy_cell)]
 #![feature(map_try_insert)]
 // #![feature(new_uninit)]
+#![feature(stmt_expr_attributes)]
 #![feature(test)]
 
 pub mod day01;

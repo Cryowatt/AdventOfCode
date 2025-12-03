@@ -1,7 +1,7 @@
+use itertools::Itertools;
+
 use advent::*;
 use num::Integer;
-use onig::Regex;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 advent_day!(Day02, parse, Vec<(u64, u64)>, part1, part2);
 
@@ -15,6 +15,10 @@ pub fn parse(input: &str) -> InputType<'_> {
         .collect()
 }
 
+const SPLITS: [u64; 10] = [
+    1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
+];
+
 /// ```rust
 /// use advent_of_code_2025::day02::*;
 /// let input = parse(
@@ -22,27 +26,66 @@ pub fn parse(input: &str) -> InputType<'_> {
 /// assert_eq!(1227775554, part1(&input));
 /// ```
 pub fn part1(input: &InputType) -> u64 {
+    let patterns: Vec<Vec<(u32, u64)>> = vec![
+        vec![],                 // 0
+        vec![],                 // 1
+        vec![(1, 11)],          // 2
+        vec![],                 // 3
+        vec![(2, 01_01)],       // 4
+        vec![],                 // 5
+        vec![(3, 001_001)],     // 6
+        vec![],                 // 7
+        vec![(4, 0001_0001)],   // 8
+        vec![],                 // 9
+        vec![(5, 00001_00001)], // 10
+    ];
+
+    find_patterns(input, patterns)
+}
+
+fn find_patterns(input: &InputType, patterns: Vec<Vec<(u32, u64)>>) -> u64 {
     input
         .iter()
-        .map(|&(start, end)| {
-            let prefix_start = start.shr10(start.digits().div_ceil(2));
-            let prefix_end = end.shr10(end.digits() / 2);
-            (prefix_start..=prefix_end)
-                .filter_map(|prefix| {
-                    if prefix == 0 {
-                        None
-                    } else {
-                        let id = prefix.shl10(prefix.digits()) + prefix;
-                        if id >= start && id <= end {
-                            Some(id)
-                        } else {
-                            None
-                        }
-                    }
+        .flat_map(|(start, end)| {
+            // Normalize ranges to same decimal lengths
+            let mut ranges = vec![*start];
+
+            for i in start.digits()..end.digits() {
+                ranges.push(SPLITS[i as usize]);
+            }
+
+            ranges.push(*end + 1);
+
+            ranges
+                .windows(2)
+                .map(|x| (x[0], x[1] - 1))
+                .collect::<Vec<(u64, u64)>>()
+        })
+        .map(|(start, end)| {
+            // Use patterns table to build candidates from prefixes
+            let digits = start.digits();
+            patterns
+                .get(digits as usize)
+                .unwrap()
+                .iter()
+                .flat_map(|(prefix, pattern)| {
+                    let step = 1u64.shl10(digits - prefix);
+                    (start..(end + step))
+                        .step_by(step as usize)
+                        .filter_map(move |source| {
+                            let prefix = source.shr10(digits - prefix);
+                            let candidate = prefix * pattern;
+                            if start <= candidate && candidate <= end {
+                                Some(candidate)
+                            } else {
+                                None
+                            }
+                        })
                 })
+                .unique()
                 .sum::<u64>()
         })
-        .sum()
+        .sum::<u64>()
 }
 
 /// ```rust
@@ -52,35 +95,19 @@ pub fn part1(input: &InputType) -> u64 {
 /// assert_eq!(4174379265, part2(&input));
 /// ```
 pub fn part2(input: &InputType) -> u64 {
-    let pattern_shift = [1, 10, 100, 1000, 10000, 100000];
-    input
-        .iter()
-        .map(|(start, end)| {
-            (*start..=*end)
-                .filter(|id| {
-                    let digits = id.digits();
-                    for pattern_length in 1..digits {
-                        let (repeats, remainder) = digits.div_rem(&pattern_length);
-                        if repeats == 0 {
-                            break;
-                        }
+    let patterns: Vec<Vec<(u32, u64)>> = vec![
+        vec![],                                                       // 0
+        vec![],                                                       // 1
+        vec![(1, 11)],                                                // 2
+        vec![(1, 111)],                                               // 3
+        vec![(1, 1111), (2, 01_01)],                                  // 4
+        vec![(1, 11111)],                                             // 5
+        vec![(1, 111111), (2, 01_01_01), (3, 001_001)],               // 6
+        vec![(1, 1111111)],                                           // 7
+        vec![(1, 11111111), (2, 01_01_01_01), (4, 0001_0001)],        // 8
+        vec![(1, 111111111), (3, 001_001_001)],                       // 9
+        vec![(1, 1111111111), (2, 01_01_01_01_01), (5, 00001_00001)], // 10
+    ];
 
-                        if remainder != 0 {
-                            continue;
-                        }
-
-                        // let pattern_shift = 1u64.shl10(pattern_length);
-                        let pattern = (1..repeats).fold(1, |pattern, _| {
-                            (pattern * pattern_shift[pattern_length as usize]) + 1
-                        });
-
-                        if id.div_exact(pattern).is_some() {
-                            return true;
-                        }
-                    }
-                    false
-                })
-                .sum::<u64>()
-        })
-        .sum()
+    find_patterns(input, patterns)
 }
