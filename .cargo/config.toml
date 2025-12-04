@@ -1,25 +1,264 @@
 [alias] # command aliases
-all = "run"
-day = "run --bin day"
-ci-2015 = [
+advent = [
     "watch",
     "--clear",
     "-x",
     "test --doc",
     "-x",
-    "run --bin advent_of_code_2015",
+    "run --release",
     "-x",
     "bench",
 ]
-ci-2023 = [
+day01 = [
     "watch",
     "--clear",
     "-x",
-    "test --doc",
+    "test --doc day01",
     "-x",
-    "run --bin advent_of_code_2023",
+    "run --release --bin day 1",
     "-x",
-    "bench",
+    "bench day01",
 ]
-wb = "watch --clear -x bench"
-everything-forever = "watch --clear -x test -x run -x bench"
+day02 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day02",
+    "-x",
+    "run --release --bin day 2",
+    "-x",
+    "bench day02",
+]
+day03 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day03",
+    "-x",
+    "run --release --bin day 3",
+    "-x",
+    "bench day03",
+]
+day04 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day04",
+    "-x",
+    "run --release --bin day 4",
+    "-x",
+    "bench day04",
+]
+day05 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day05",
+    "-x",
+    "run --release --bin day 5",
+    "-x",
+    "bench day05",
+]
+day06 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day06",
+    "-x",
+    "run --release --bin day 6",
+    "-x",
+    "bench day06",
+]
+day07 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day07",
+    "-x",
+    "run --release --bin day 7",
+    "-x",
+    "bench day07",
+]
+day08 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day08",
+    "-x",
+    "run --release --bin day 8",
+    "-x",
+    "bench day08",
+]
+day09 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day09",
+    "-x",
+    "run --release --bin day 9",
+    "-x",
+    "bench day09",
+]
+day10 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day10",
+    "-x",
+    "run --release --bin day 10",
+    "-x",
+    "bench day10",
+]
+day11 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day11",
+    "-x",
+    "run --release --bin day 11",
+    "-x",
+    "bench day11",
+]
+day12 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day12",
+    "-x",
+    "run --release --bin day 12",
+    "-x",
+    "bench day12",
+]
+day13 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day13",
+    "-x",
+    "run --release --bin day 13",
+    "-x",
+    "bench day13",
+]
+day14 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day14",
+    "-x",
+    "run --release --bin day 14",
+    "-x",
+    "bench day14",
+]
+day15 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day15",
+    "-x",
+    "run --release --bin day 15",
+    "-x",
+    "bench day15",
+]
+day16 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day16",
+    "-x",
+    "run --release --bin day 16",
+    "-x",
+    "bench day16",
+]
+day17 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day17",
+    "-x",
+    "run --release --bin day 17",
+    "-x",
+    "bench day17",
+]
+day18 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day18",
+    "-x",
+    "run --release --bin day 18",
+    "-x",
+    "bench day18",
+]
+day19 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day19",
+    "-x",
+    "run --release --bin day 19",
+    "-x",
+    "bench day19",
+]
+day20 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day20",
+    "-x",
+    "run --release --bin day 20",
+    "-x",
+    "bench day20",
+]
+day21 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day21",
+    "-x",
+    "run --release --bin day 21",
+    "-x",
+    "bench day21",
+]
+day22 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day22",
+    "-x",
+    "run --release --bin day 22",
+    "-x",
+    "bench day22",
+]
+day23 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day23",
+    "-x",
+    "run --release --bin day 23",
+    "-x",
+    "bench day23",
+]
+day24 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day24",
+    "-x",
+    "run --release --bin day 24",
+    "-x",
+    "bench day24",
+]
+day25 = [
+    "watch",
+    "--clear",
+    "-x",
+    "test --doc day25",
+    "-x",
+    "run --release --bin day 25",
+    "-x",
+    "bench day25",
+]
+
+[build]
+rustflags = ["-C", "target-cpu=native"]

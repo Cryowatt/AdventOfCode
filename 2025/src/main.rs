@@ -6,16 +6,28 @@ use advent_of_code_2025::*;
 fn main() {
     println!("AdventOfCode 2025");
 
-    run_day!(1, day01::Day01);
-    run_day!(2, day02::Day02);
-    run_day!(3, day03::Day03);
-    // run_day!(4, day04::Day04);
-    // run_day!(5, day05::Day05);
-    // run_day!(6, day06::Day06);
-    // run_day!(7, day07::Day07);
-    // run_day!(8, day08::Day08);
-    // run_day!(9, day09::Day09);
-    // run_day!(10, day10::Day10);
-    // run_day!(11, day11::Day11);
-    // run_day!(12, day12::Day12);
+    #[cfg(feature = "day01")]
+    println!("{}", day01::Day::default().all());
+    #[cfg(feature = "day02")]
+    println!("{}", day02::Day::default().all());
+    #[cfg(feature = "day03")]
+    println!("{}", day03::Day::default().all());
+    #[cfg(feature = "day04")]
+    println!("{}", day04::Day::default().all());
+    #[cfg(feature = "day05")]
+    println!("{}", day05::Day::default().all());
+    #[cfg(feature = "day06")]
+    println!("{}", day06::Day::default().all());
+    #[cfg(feature = "day07")]
+    println!("{}", day07::Day::default().all());
+    #[cfg(feature = "day08")]
+    println!("{}", day08::Day::default().all());
+    #[cfg(feature = "day09")]
+    println!("{}", day09::Day::default().all());
+    #[cfg(feature = "day10")]
+    println!("{}", day10::Day::default().all());
+    #[cfg(feature = "day11")]
+    println!("{}", day11::Day::default().all());
+    #[cfg(feature = "day12")]
+    println!("{}", day12::Day::default().all());
 }

@@ -199,8 +199,77 @@ macro_rules! run_day {
     };
 }
 
+pub trait AdventDay: Send + Sync {
+    fn part1(&self) -> String;
+    fn part2(&self) -> String;
+}
+
+pub trait DayPrinter: AdventDay + DayId {
+    fn all(&self) -> String {
+        format!(
+            "Day {}#\t[{:<20}] [{:<20}]",
+            <Self as DayId>::DAY_ID,
+            self.part1(),
+            self.part2()
+        )
+    }
+}
+
+pub trait DayParser<D: AdventDay> {
+    fn parse(input: &'_ str) -> D;
+}
+
+pub trait DayId {
+    const DAY_ID: u8;
+}
+
 #[macro_export]
 macro_rules! advent_day {
+    ($day:ident, $day_id:literal, $input_type:ty) => {
+        pub struct $day($input_type);
+        type InputType<'a> = $input_type;
+        pub type Day = $day;
+
+        impl $day {
+            pub const INPUT: &'static str = include_str!("input.txt");
+            const DAY_ID: u8 = $day_id;
+            pub fn input(&self) -> &$input_type {
+                &self.0
+            }
+        }
+
+        impl DayPrinter for $day {}
+
+        impl DayId for $day {
+            const DAY_ID: u8 = $day_id;
+        }
+
+        impl Default for $day {
+            fn default() -> Self {
+                Self::parse(Self::INPUT)
+            }
+        }
+
+        #[cfg(test)]
+        mod bench {
+            use advent::AdventDay;
+            extern crate test;
+
+            #[bench]
+            fn part1_bench(b: &mut test::Bencher) {
+                b.bytes = super::$day::INPUT.len() as u64;
+                let day = super::$day::default();
+                b.iter(|| test::black_box(day.part1()));
+            }
+
+            #[bench]
+            fn part2_bench(b: &mut test::Bencher) {
+                b.bytes = super::$day::INPUT.len() as u64;
+                let day = super::$day::default();
+                b.iter(|| test::black_box(day.part2()));
+            }
+        }
+    };
     ($day:ident, $parser:expr, $input_type:ty, $part1_func:ident, $part2_func:ident) => {
         pub const INPUT: &'static str = include_str!("input.txt");
         type InputType<'a> = $input_type;
@@ -245,7 +314,7 @@ macro_rules! advent_bench {
         mod $module {
             extern crate test;
 
-            // #[cfg(feature = "cursed")]
+            #[cfg(feature = "cursed")]
             #[bench]
             fn bench(b: &mut test::Bencher) {
                 let input = super::$parser(include_str!("input.txt"));
@@ -258,14 +327,14 @@ macro_rules! advent_bench {
         mod $module {
             extern crate test;
 
-            // #[cfg(feature = "cursed")]
+            #[cfg(feature = "cursed")]
             #[bench]
             fn part1_bench(b: &mut test::Bencher) {
                 let input = super::$parser(include_str!("input.txt"));
                 b.iter(|| test::black_box(super::$part1_func(&input)));
             }
 
-            // #[cfg(feature = "cursed")]
+            #[cfg(feature = "cursed")]
             #[bench]
             fn part2_bench(b: &mut test::Bencher) {
                 let input = super::$parser(include_str!("input.txt"));

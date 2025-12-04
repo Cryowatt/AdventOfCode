@@ -11,43 +11,34 @@ fn main() {
         .expect("No arguments specified")
         .parse::<u8>()
         .expect("Day ID must be a number");
-    match day_id {
-        1 => {
-            run_day!(1, day01::Day01);
+    println!(
+        "{}",
+        match day_id {
+            #[cfg(feature = "day01")]
+            day01::Day::DAY_ID => day01::Day::default().all(),
+            #[cfg(feature = "day02")]
+            day02::Day::DAY_ID => day02::Day::default().all(),
+            #[cfg(feature = "day03")]
+            day03::Day::DAY_ID => day03::Day::default().all(),
+            #[cfg(feature = "day04")]
+            day04::Day::DAY_ID => day04::Day::default().all(),
+            #[cfg(feature = "day05")]
+            day05::Day::DAY_ID => day05::Day::default().all(),
+            #[cfg(feature = "day06")]
+            day06::Day::DAY_ID => day06::Day::default().all(),
+            #[cfg(feature = "day07")]
+            day07::Day::DAY_ID => day07::Day::default().all(),
+            #[cfg(feature = "day08")]
+            day08::Day::DAY_ID => day08::Day::default().all(),
+            #[cfg(feature = "day09")]
+            day09::Day::DAY_ID => day09::Day::default().all(),
+            #[cfg(feature = "day10")]
+            day10::Day::DAY_ID => day10::Day::default().all(),
+            #[cfg(feature = "day11")]
+            day11::Day::DAY_ID => day11::Day::default().all(),
+            #[cfg(feature = "day12")]
+            day12::Day::DAY_ID => day12::Day::default().all(),
+            _ => unimplemented!(),
         }
-        2 => {
-            run_day!(2, day02::Day02);
-        }
-        3 => {
-            run_day!(3, day03::Day03);
-        }
-        // 4 => {
-        //     run_day!(4, day04::Day04);
-        // }
-        // 5 => {
-        //     run_day!(5, day05::Day05);
-        // }
-        // 6 => {
-        //     run_day!(6, day06::Day06);
-        // }
-        // 7 => {
-        //     run_day!(7, day07::Day07);
-        // }
-        // 8 => {
-        //     run_day!(8, day08::Day08);
-        // }
-        // 9 => {
-        //     run_day!(9, day09::Day09);
-        // }
-        // 10 => {
-        //     run_day!(10, day10::Day10);
-        // }
-        // 11 => {
-        //     run_day!(11, day11::Day11);
-        // }
-        // 12 => {
-        //     run_day!(12, day12::Day12);
-        // }
-        _ => unimplemented!(),
-    }
+    )
 }
