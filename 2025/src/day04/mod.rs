@@ -118,6 +118,7 @@ impl AdventDay for Day {
             }
             total
         });
+        let mut stack: Vec<UPoint> = vec![];
         let mut grid = verticals
             .enumerate()
             .map(|(y, row)| {
@@ -131,6 +132,7 @@ impl AdventDay for Day {
                             if x < bounds.x as usize - 1 {
                                 rolls += row[x + 1]
                             }
+                            stack.push(UPoint::new(x as u32, y as u32));
                             rolls
                         } else {
                             0
@@ -140,9 +142,6 @@ impl AdventDay for Day {
             })
             .collect::<Vec<_>>();
 
-        let mut stack = (0..bounds.y)
-            .flat_map(|y| (0..bounds.x).map(move |x| UPoint::new(x, y)))
-            .collect::<Vec<_>>();
         fn dec_rolls(p: Point<u32>, grid: &mut Vec<Vec<u8>>, stack: &mut Vec<UPoint>) {
             if grid[p.y as usize][p.x as usize] > 0 {
                 grid[p.y as usize][p.x as usize] -= 1;
