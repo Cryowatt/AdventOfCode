@@ -29,7 +29,7 @@ rayon = "1.8"
 regex = "1.10"
 
 [features]
-default = ["day01", "day02", "day03", "day04"]
+default = ["day01", "day02", "day03", "day04", "day05"]
 cursed = []
 day01 = []
 day02 = []
