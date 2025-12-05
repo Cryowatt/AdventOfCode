@@ -140,50 +140,45 @@ impl AdventDay for Day {
             })
             .collect::<Vec<_>>();
 
-        let mut queue = vec![UPoint::origin()];
-        fn dec_rolls(p: Point<u32>, grid: &mut Vec<Vec<u8>>, queue: &mut Vec<UPoint>) {
+        let mut stack = (0..bounds.y)
+            .flat_map(|y| (0..bounds.x).map(move |x| UPoint::new(x, y)))
+            .collect::<Vec<_>>();
+        fn dec_rolls(p: Point<u32>, grid: &mut Vec<Vec<u8>>, stack: &mut Vec<UPoint>) {
             if grid[p.y as usize][p.x as usize] > 0 {
                 grid[p.y as usize][p.x as usize] -= 1;
-                queue.push(p);
+                stack.push(p);
             }
         }
 
         let mut removed_count = 0;
-        while let Some(point) = queue.pop() {
+        while let Some(point) = stack.pop() {
             let rolls = grid[point.y as usize][point.x as usize];
             if 0 < rolls && rolls < 5 {
                 removed_count.inc();
                 grid[point.y as usize][point.x as usize] = 0;
                 if let Some(p) = point.north_checked() {
-                    dec_rolls(p, &mut grid, &mut queue);
+                    dec_rolls(p, &mut grid, &mut stack);
                     if let Some(p) = p.west_checked() {
-                        dec_rolls(p, &mut grid, &mut queue);
+                        dec_rolls(p, &mut grid, &mut stack);
                     }
                     if let Some(p) = p.east_checked(&bounds) {
-                        dec_rolls(p, &mut grid, &mut queue);
+                        dec_rolls(p, &mut grid, &mut stack);
                     }
                 }
                 if let Some(p) = point.west_checked() {
-                    dec_rolls(p, &mut grid, &mut queue);
+                    dec_rolls(p, &mut grid, &mut stack);
                 }
                 if let Some(p) = point.south_checked(&bounds) {
-                    dec_rolls(p, &mut grid, &mut queue);
+                    dec_rolls(p, &mut grid, &mut stack);
                     if let Some(p) = p.west_checked() {
-                        dec_rolls(p, &mut grid, &mut queue);
+                        dec_rolls(p, &mut grid, &mut stack);
                     }
                     if let Some(p) = p.east_checked(&bounds) {
-                        dec_rolls(p, &mut grid, &mut queue);
+                        dec_rolls(p, &mut grid, &mut stack);
                     }
                 }
                 if let Some(p) = point.east_checked(&bounds) {
-                    dec_rolls(p, &mut grid, &mut queue);
-                }
-            } else {
-                if let Some(p) = point.east_checked(&bounds) {
-                    queue.push(p);
-                } else if let Some(mut p) = point.south_checked(&bounds) {
-                    p.x = 0;
-                    queue.push(p);
+                    dec_rolls(p, &mut grid, &mut stack);
                 }
             }
         }
