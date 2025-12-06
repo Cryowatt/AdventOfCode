@@ -82,8 +82,6 @@ impl AdventDay for Day {
             .to_string()
     }
 
-    // Low: 3315119450
-
     /// ```rust
     /// use advent::*;
     /// use advent_of_code_2025::day06::*;
