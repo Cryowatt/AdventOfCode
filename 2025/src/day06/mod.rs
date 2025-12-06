@@ -64,9 +64,15 @@ impl AdventDay for Day {
         self.input()
             .iter()
             .map(|(operand_rows, operator)| {
-                let operands = operand_rows
-                    .iter()
-                    .map(|row| row.trim().parse::<u64>().unwrap());
+                let operands = operand_rows.iter().map(|row| {
+                    row.chars().fold(0, |acc, c| {
+                        if let Some(digit) = c.to_digit(10) {
+                            acc * 10 + digit as u64
+                        } else {
+                            acc
+                        }
+                    })
+                });
                 match operator {
                     Operator::Addition => operands.sum::<u64>(),
                     Operator::Multiplication => operands.product(),
