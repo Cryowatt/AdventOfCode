@@ -88,9 +88,30 @@ impl AdventDay for Day {
     /// ...............
     /// .^.^.^.^.^...^.
     /// ..............."#);
-    /// assert_eq!("", day.part2());
+    /// assert_eq!("40", day.part2());
     /// ```
     fn part2(&self) -> String {
-        "".to_string()
+        let mut state = self
+            .input()
+            .first()
+            .unwrap()
+            .iter()
+            .map(|cell| match cell {
+                Cell::Beam => 1,
+                _ => 0,
+            })
+            .collect::<Vec<_>>();
+        for row in self.input().iter().skip(2).step_by(2) {
+            for i in 0..state.len() {
+                let multiverses = state[i];
+                if row[i] == Cell::Splitter && state[i] > 0 {
+                    // Maths
+                    state[i] = 0;
+                    state[i - 1] += multiverses;
+                    state[i + 1] += multiverses;
+                }
+            }
+        }
+        state.iter().sum::<u64>().to_string()
     }
 }
