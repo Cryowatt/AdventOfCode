@@ -4,6 +4,7 @@
 // #![feature(bound_map)]
 #![feature(coroutines)]
 #![feature(exact_div)]
+#![feature(exact_length_collection)]
 // #![feature(extend_one)]
 #![feature(int_roundings)]
 // #![feature(isqrt)]

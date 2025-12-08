@@ -223,6 +223,11 @@ pub trait DayId {
     const DAY_ID: u8;
 }
 
+pub trait AdventInput<TInput> {
+    const INPUT: &'static str;
+    fn input(&self) -> &TInput;
+}
+
 #[macro_export]
 macro_rules! advent_day {
     ($day:ident, $day_id:literal, $input_type:ty) => {
@@ -230,10 +235,9 @@ macro_rules! advent_day {
         type InputType<'a> = $input_type;
         pub type Day = $day;
 
-        impl $day {
-            pub const INPUT: &'static str = include_str!("input.txt");
-            const DAY_ID: u8 = $day_id;
-            pub fn input(&self) -> &$input_type {
+        impl AdventInput<$input_type> for $day {
+            const INPUT: &'static str = include_str!("input.txt");
+            fn input(&self) -> &$input_type {
                 &self.0
             }
         }
@@ -252,7 +256,7 @@ macro_rules! advent_day {
 
         #[cfg(test)]
         mod bench {
-            use advent::AdventDay;
+            use advent::{AdventDay, AdventInput};
             extern crate test;
 
             #[bench]
