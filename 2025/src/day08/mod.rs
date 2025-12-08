@@ -1,4 +1,7 @@
-use std::collections::{BinaryHeap, HashSet};
+use std::{
+    cmp::Reverse,
+    collections::{BinaryHeap, HashSet},
+};
 
 use advent::*;
 
@@ -149,9 +152,6 @@ impl Day {
     }
 }
 
-// Too high:  400309
-// Too high: 1078000
-
 impl AdventDay for Day {
     fn part1(&self) -> String {
         self.part1_impl::<1000>()
@@ -181,9 +181,80 @@ impl AdventDay for Day {
     /// 862,61,35
     /// 984,92,344
     /// 425,690,689");
-    /// assert_eq!("", day.part2());
+    /// assert_eq!("25272", day.part2());
     /// ```
     fn part2(&self) -> String {
-        "".to_string()
+        let points = self.input();
+        let mut point_tree: Tree = KdTree::with_capacity(1000);
+        let mut distance_rank: BinaryHeap<Reverse<Connection>> = BinaryHeap::new();
+
+        // Fill the kdtree and rank nearest neighbours
+        for (index, [x, y, z]) in points.iter().enumerate() {
+            let point = &[Axis::from_num(*x), Axis::from_num(*y), Axis::from_num(*z)];
+
+            for nearest in point_tree.nearest_n::<SquaredEuclidean>(point, points.len()) {
+                distance_rank.push(Reverse(Connection {
+                    distance: nearest.distance,
+                    a: index,
+                    b: nearest.item,
+                }));
+            }
+            point_tree.add(point, index);
+        }
+
+        let mut network_map: Vec<HashSet<usize>> = points
+            .iter()
+            .enumerate()
+            .map(|(index, _)| HashSet::from([index]))
+            .collect::<Vec<_>>();
+
+        while network_map.len() > 1 {
+            let Reverse(connection) = distance_rank.pop().unwrap();
+
+            let point_a = connection.a;
+            let point_b = connection.b;
+            let net_a_id = network_map
+                .iter()
+                .position(|network| network.contains(&point_a));
+            let net_b_id = network_map
+                .iter()
+                .position(|network| network.contains(&point_b));
+
+            if let Some(net_a_id) = net_a_id {
+                // Point A is already on a network
+                if let Some(net_b_id) = net_b_id {
+                    if net_a_id == net_b_id {
+                        // Already connected
+                    } else {
+                        // Network merge
+                        let low_id = net_a_id.min(net_b_id);
+                        let high_id = net_a_id.max(net_b_id);
+                        let net = network_map
+                            .swap_remove(high_id)
+                            .union(&network_map.swap_remove(low_id))
+                            .copied()
+                            .collect();
+                        if network_map.is_empty() {
+                            return (points[point_a][0] as u64 * points[point_b][0] as u64)
+                                .to_string();
+                        } else {
+                            network_map.push(net);
+                        }
+                    }
+                } else {
+                    // Add Point B to Network A
+                    network_map.get_mut(net_a_id).unwrap().insert(point_b);
+                }
+            } else if let Some(net_b_id) = net_b_id {
+                // Add Point A to Network B
+                network_map.get_mut(net_b_id).unwrap().insert(point_a);
+            } else {
+                // This is a new network
+                let net = HashSet::from([point_a, point_b]);
+                network_map.push(net);
+            }
+        }
+
+        unreachable!()
     }
 }
